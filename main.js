@@ -681,9 +681,9 @@
       }
     }));
 
-    // Open the first category by default
-    render("languages", false);
-    requestAnimationFrame(() => { panel.style.height = "auto"; logoGrid.querySelectorAll(".logo-tile").forEach((t) => (t.style.opacity = 1)); });
+    // Nothing selected until the visitor picks a category
+    tabs.forEach((t) => { t.classList.remove("is-active"); t.setAttribute("aria-selected", "false"); });
+    panel.style.height = "0px";
   }
 
 })();
