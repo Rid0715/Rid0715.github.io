@@ -439,12 +439,12 @@
         const speed = dist / dt; // px per ms
         if (dist > 2) {
           const inCard = !!(e.target && e.target.closest && e.target.closest(".card"));
-          const base = inCard ? 0.09 : 0.05;
-          const amp = base + Math.min(speed, 2.5) * (inCard ? 0.09 : 0.06);
-          const steps = Math.min(6, Math.max(1, Math.round(dist / 9)));
+          const base = inCard ? 0.05 : 0.03;
+          const amp = base + Math.min(speed, 2) * (inCard ? 0.06 : 0.04);
+          const steps = Math.min(4, Math.max(1, Math.round(dist / 14)));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
-            press(lastMove.x + (x - lastMove.x) * t, lastMove.y + (y - lastMove.y) * t, amp, 1.7 + Math.min(speed, 2) * 0.5);
+            press(lastMove.x + (x - lastMove.x) * t, lastMove.y + (y - lastMove.y) * t, amp / steps + amp * 0.5, 1.6 + Math.min(speed, 2) * 0.4);
           }
         }
       }
