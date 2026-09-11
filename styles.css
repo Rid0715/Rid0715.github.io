@@ -152,6 +152,9 @@ html.theming, html.theming * { transition: background-color 0.5s ease, color 0.5
 .card { z-index: 1; }
 .reduced .ripples { display: none; }
 
+/* Words that float on the water surface */
+.fl { display: inline-block; will-change: transform; }
+
 /* ============ Cursor, progress, grain ============ */
 .cursor { position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: none; }
 @media (hover: hover) and (pointer: fine) { .cursor { display: block; } body.has-cursor, body.has-cursor a, body.has-cursor button { cursor: none; } }

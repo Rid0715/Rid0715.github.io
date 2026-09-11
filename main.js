@@ -34,7 +34,6 @@
 
   /* ============ Always-on features ============ */
   setupTheme();
-  setupRipples();
   setupNav();
   setupSkills();
   setupQuotes();
@@ -197,6 +196,7 @@
   });
 
   setupBurst(true);
+  setupRipples();
   window.addEventListener("load", () => ScrollTrigger.refresh());
 
   /* ============ Feature setups ============ */
@@ -237,7 +237,7 @@
     });
   }
 
-  /* ---------- Water ripples ---------- */
+  /* ---------- Water: ripples in the background, text floats on the surface ---------- */
   function setupRipples() {
     const canvas = document.getElementById("ripples");
     if (!canvas || reduced) return;
@@ -250,53 +250,126 @@
       W = window.innerWidth; H = window.innerHeight;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cacheDirty = true;
     }
-    resize();
-    window.addEventListener("resize", resize, { passive: true });
 
     function color() {
       const cs = getComputedStyle(document.documentElement);
       return { rgb: (cs.getPropertyValue("--ripple") || "255,255,255").trim(), a: parseFloat(cs.getPropertyValue("--ripple-alpha")) || 0.2 };
     }
 
-    function drop(x, y, strength) {
-      drops.push({ x, y, t0: performance.now(), s: strength, c: color() });
+    /* ----- floaters: words on the background that ride the waves ----- */
+    const FLOAT_SPLIT = [
+      ".section-head .sub", ".section-head .kicker", ".lede",
+      ".job-head h3", ".job-date", ".job-role", ".job-points li",
+      ".quote p", ".quote cite", ".contact .sub", ".contact .kicker", ".skills .sub",
+    ];
+    function splitWords(root) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      const nodes = [];
+      while (walker.nextNode()) if (walker.currentNode.nodeValue.trim()) nodes.push(walker.currentNode);
+      nodes.forEach((node) => {
+        const frag = document.createDocumentFragment();
+        node.nodeValue.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+          const sp = document.createElement("span"); sp.className = "fl"; sp.textContent = part; frag.appendChild(sp);
+        });
+        node.parentNode.replaceChild(frag, node);
+      });
+    }
+    document.querySelectorAll(FLOAT_SPLIT.join(",")).forEach(splitWords);
+    document.querySelectorAll(".section-head .line, .statement-text .w, .eyebrow .eb").forEach((el) => el.classList.add("fl"));
+
+    let floaters = [], cacheDirty = true, lastCache = 0;
+    function cacheFloaters() {
+      const sy = window.scrollY, sx = window.scrollX;
+      floaters = [...document.querySelectorAll(".fl")].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { el, x: r.left + r.width / 2 + sx, y: r.top + r.height / 2 + sy, moved: false };
+      });
+      cacheDirty = false; lastCache = performance.now();
+    }
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("load", () => { cacheDirty = true; });
+    resize();
+
+    /* ----- drops (stored in page coordinates so scrolling keeps everything aligned) ----- */
+    function drop(cx, cy, strength) {
+      drops.push({ x: cx + window.scrollX, y: cy + window.scrollY, t0: performance.now(), s: strength, c: color() });
       if (drops.length > 40) drops.shift();
       if (!raf) raf = requestAnimationFrame(frame);
     }
 
+    // ring phases: first crest strongest, then lighter, then faint
+    const PHASES = [1, 0.55, 0.3];
     function frame(now) {
+      if (cacheDirty || now - lastCache > 1500) cacheFloaters();
+      const sy = window.scrollY, sx = window.scrollX;
       ctx.clearRect(0, 0, W, H);
+
+      const live = [];
       for (let i = drops.length - 1; i >= 0; i--) {
         const d = drops[i];
-        const life = 1900 * (0.7 + d.s * 0.5);
+        const life = 2000 * (0.7 + d.s * 0.5);
         const p = (now - d.t0) / life;
         if (p >= 1) { drops.splice(i, 1); continue; }
         const ease = 1 - Math.pow(1 - p, 2.4);
-        const maxR = 120 + 240 * d.s;
+        const maxR = 130 + 260 * d.s;
         const fade = Math.pow(1 - p, 1.5);
-        // three rings trailing each other, thinning as they travel
+        const spacing = 18 + 12 * d.s;
+        const rings = [];
+        const vx = d.x - sx, vy = d.y - sy;
         for (let k = 0; k < 3; k++) {
-          const r = ease * maxR - k * (16 + 10 * d.s);
+          const r = ease * maxR - k * spacing;
           if (r <= 1) continue;
-          const alpha = d.c.a * fade * (1 - k * 0.3);
+          rings.push({ r, amp: PHASES[k] });
+          if (vx < -maxR || vx > W + maxR || vy < -maxR || vy > H + maxR) continue;
           ctx.beginPath();
-          ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
-          ctx.lineWidth = Math.max(0.5, (1.8 - k * 0.45) * (1 - p * 0.6));
-          ctx.strokeStyle = `rgba(${d.c.rgb}, ${alpha.toFixed(3)})`;
+          ctx.arc(vx, vy, r, 0, Math.PI * 2);
+          ctx.lineWidth = Math.max(0.5, (1.9 - k * 0.5) * (1 - p * 0.6));
+          ctx.strokeStyle = `rgba(${d.c.rgb}, ${(d.c.a * fade * PHASES[k]).toFixed(3)})`;
           ctx.stroke();
         }
-        // the impact: a soft glow that disappears quickly
-        if (p < 0.35) {
-          const g = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, 26 + 40 * d.s);
+        if (p < 0.35 && vx > -80 && vx < W + 80 && vy > -80 && vy < H + 80) {
+          const gr = 26 + 40 * d.s;
+          const g = ctx.createRadialGradient(vx, vy, 0, vx, vy, gr);
           const ga = d.c.a * 0.9 * (1 - p / 0.35);
           g.addColorStop(0, `rgba(${d.c.rgb}, ${ga.toFixed(3)})`);
           g.addColorStop(1, `rgba(${d.c.rgb}, 0)`);
           ctx.fillStyle = g;
-          ctx.beginPath(); ctx.arc(d.x, d.y, 26 + 40 * d.s, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(vx, vy, gr, 0, Math.PI * 2); ctx.fill();
         }
+        live.push({ x: d.x, y: d.y, rings, amp: 7 * d.s * fade, reach: maxR + 60 });
       }
+
+      /* words near a passing crest get lifted outward, then settle back */
+      const top = sy - 300, bottom = sy + H + 300;
+      for (let i = 0; i < floaters.length; i++) {
+        const f = floaters[i];
+        if (f.y < top || f.y > bottom) { if (f.moved) { f.el.style.transform = ""; f.moved = false; } continue; }
+        let dx = 0, dy = 0;
+        for (let j = 0; j < live.length; j++) {
+          const L = live[j];
+          const ox = f.x - L.x, oy = f.y - L.y;
+          const dist = Math.hypot(ox, oy);
+          if (dist > L.reach || dist < 1) continue;
+          let h = 0;
+          for (let k = 0; k < L.rings.length; k++) {
+            const g = (dist - L.rings[k].r) / 30;
+            h += L.rings[k].amp * Math.exp(-g * g);
+          }
+          if (h < 0.01) continue;
+          const push = h * L.amp;
+          dx += (ox / dist) * push;
+          dy += (oy / dist) * push - push * 0.45;
+        }
+        if (dx || dy) { f.el.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0)`; f.moved = true; }
+        else if (f.moved) { f.el.style.transform = ""; f.moved = false; }
+      }
+
       raf = drops.length ? requestAnimationFrame(frame) : null;
+      if (!raf) floaters.forEach((f) => { if (f.moved) { f.el.style.transform = ""; f.moved = false; } });
     }
 
     // A drop wherever you click or tap
@@ -309,13 +382,13 @@
     if (finePointer) {
       document.querySelectorAll(".card").forEach((card) => {
         let lx = 0, ly = 0, lt = 0;
-        card.addEventListener("pointerenter", (e) => { lx = e.clientX; ly = e.clientY; lt = performance.now(); drop(e.clientX, e.clientY, 0.55); });
+        card.addEventListener("pointerenter", (e) => { lx = e.clientX; ly = e.clientY; lt = performance.now(); drop(e.clientX, e.clientY, 0.6); });
         card.addEventListener("pointermove", (e) => {
           const now = performance.now();
           const dist = Math.hypot(e.clientX - lx, e.clientY - ly);
-          if (dist < 34 || now - lt < 110) return;
+          if (dist < 30 || now - lt < 100) return;
           lx = e.clientX; ly = e.clientY; lt = now;
-          drop(e.clientX, e.clientY, 0.28 + Math.min(dist, 120) / 400);
+          drop(e.clientX, e.clientY, 0.3 + Math.min(dist, 120) / 350);
         }, { passive: true });
       });
     }
@@ -331,6 +404,7 @@
     };
     schedule();
     document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
+    document.addEventListener("click", () => { cacheDirty = true; }, true);
   }
 
   function setupNav() {
