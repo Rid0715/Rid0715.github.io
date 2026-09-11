@@ -243,11 +243,12 @@
     if (!canvas || reduced) return;
     const ctx = canvas.getContext("2d", { alpha: true });
     const CELL = 6;            // simulation cell size in CSS px
-    const DAMP = 0.986;        // energy loss per step (water viscosity)
     const SHADE = 4.2;         // slope -> light intensity
     const WORD_G = 46;         // slope -> word displacement (px)
     const WORD_L = 7;          // height -> word lift (px)
-    let W = 0, H = 0, cols = 0, rows = 0, cur, prev, off, octx, img, running = false, quiet = 0, tick = 0;
+    // two surfaces: a fast one for the leading crest, a slower, more damped one for the trailing waves
+    const FIELDS = [{ c2: 0.5, damp: 0.986 }, { c2: 0.26, damp: 0.978 }];
+    let W = 0, H = 0, cols = 0, rows = 0, cur, prev, sum, off, octx, img, running = false, quiet = 0, tick = 0;
     let lastScroll = window.scrollY, scrollAcc = 0, pointer = null, lastMove = null;
     let light = [255, 255, 255], dark = [0, 0, 0], gain = 1;
 
@@ -264,7 +265,8 @@
     function resize() {
       W = window.innerWidth; H = window.innerHeight;
       cols = Math.ceil(W / CELL) + 2; rows = Math.ceil(H / CELL) + 2;
-      cur = new Float32Array(cols * rows); prev = new Float32Array(cols * rows);
+      cur = FIELDS.map(() => new Float32Array(cols * rows)); prev = FIELDS.map(() => new Float32Array(cols * rows));
+      sum = new Float32Array(cols * rows);
       off = document.createElement("canvas"); off.width = cols; off.height = rows;
       octx = off.getContext("2d"); img = octx.createImageData(cols, rows);
       canvas.width = W; canvas.height = H;
@@ -311,8 +313,9 @@
     resize();
 
     /* ----- disturbing the surface ----- */
-    function press(x, y, amp, radius) {
+    function press(x, y, amp, radius, field) {
       // push the surface down with a smooth bump; the wave equation does the rest
+      const buf = cur[field || 0];
       const cx = x / CELL + 1, cy = y / CELL + 1;
       const r = Math.max(1.2, radius), r2 = r * r;
       const x0 = Math.max(1, Math.floor(cx - r)), x1 = Math.min(cols - 2, Math.ceil(cx + r));
@@ -321,27 +324,39 @@
         for (let xx = x0; xx <= x1; xx++) {
           const dx = xx - cx, dy = yy - cy, d2 = dx * dx + dy * dy;
           if (d2 > r2) continue;
-          cur[yy * cols + xx] -= amp * Math.exp(-3 * d2 / r2);
+          buf[yy * cols + xx] -= amp * Math.exp(-3 * d2 / r2);
         }
       }
       if (!running) { running = true; quiet = 0; requestAnimationFrame(frame); }
     }
-    const drop = (x, y, strength) => press(x, y, 0.55 + 0.75 * strength, 1.6 + 2.6 * strength);
+    // a drop is a wave train: one strong leading crest, then weaker waves that trail and fade
+    function drop(x, y, strength) {
+      const amp = 0.55 + 0.75 * strength, r = 1.6 + 2.6 * strength;
+      press(x, y, amp, r, 0);
+      const train = [[90, 0.5], [210, 0.28], [350, 0.15], [520, 0.07]];
+      train.forEach(([delay, k]) => setTimeout(() => press(x, y, amp * k, r * 0.9, 1), delay));
+    }
 
     /* ----- physics step: next = average of neighbours * 2 - previous, damped ----- */
     function step() {
-      const c = cur, pr = prev, n = cols;
-      for (let y = 1; y < rows - 1; y++) {
-        let i = y * n + 1;
-        for (let x = 1; x < n - 1; x++, i++) {
-          const v = ((c[i - 1] + c[i + 1] + c[i - n] + c[i + n]) * 0.5 - pr[i]) * DAMP;
-          pr[i] = v;
+      const n = cols;
+      for (let f = 0; f < FIELDS.length; f++) {
+        const c = cur[f], pr = prev[f], c2 = FIELDS[f].c2, damp = FIELDS[f].damp;
+        for (let y = 1; y < rows - 1; y++) {
+          let i = y * n + 1;
+          for (let x = 1; x < n - 1; x++, i++) {
+            const lap = c[i - 1] + c[i + 1] + c[i - n] + c[i + n] - 4 * c[i];
+            pr[i] = (2 * c[i] - pr[i] + c2 * lap) * damp;
+          }
         }
+        // edges absorb a little so waves do not ring forever
+        for (let x = 0; x < n; x++) { pr[x] = pr[n + x] * 0.5; pr[(rows - 1) * n + x] = pr[(rows - 2) * n + x] * 0.5; }
+        for (let y = 0; y < rows; y++) { pr[y * n] = pr[y * n + 1] * 0.5; pr[y * n + n - 1] = pr[y * n + n - 2] * 0.5; }
+        const t = cur[f]; cur[f] = prev[f]; prev[f] = t;
       }
-      // edges absorb a little so waves do not ring forever
-      for (let x = 0; x < n; x++) { pr[x] = pr[n + x] * 0.5; pr[(rows - 1) * n + x] = pr[(rows - 2) * n + x] * 0.5; }
-      for (let y = 0; y < rows; y++) { pr[y * n] = pr[y * n + 1] * 0.5; pr[y * n + n - 1] = pr[y * n + n - 2] * 0.5; }
-      const t = cur; cur = prev; prev = t;
+      // the visible surface is the sum of both
+      const a = cur[0], b = cur[1];
+      for (let i = 0; i < sum.length; i++) sum[i] = a[i] + b[i];
     }
 
     /* ----- the page scrolls: the water moves with it (and the cursor drags through it) ----- */
@@ -353,18 +368,21 @@
       if (shift) {
         scrollAcc -= shift * CELL;
         const n = Math.min(Math.abs(shift), rows - 2) * cols;
-        if (shift > 0) { cur.copyWithin(0, n); prev.copyWithin(0, n); cur.fill(0, cur.length - n); prev.fill(0, prev.length - n); }
-        else { cur.copyWithin(n, 0, cur.length - n); prev.copyWithin(n, 0, prev.length - n); cur.fill(0, 0, n); prev.fill(0, 0, n); }
+        for (let f = 0; f < FIELDS.length; f++) {
+          const c = cur[f], pr = prev[f];
+          if (shift > 0) { c.copyWithin(0, n); pr.copyWithin(0, n); c.fill(0, c.length - n); pr.fill(0, pr.length - n); }
+          else { c.copyWithin(n, 0, c.length - n); pr.copyWithin(n, 0, pr.length - n); c.fill(0, 0, n); pr.fill(0, 0, n); }
+        }
       }
       if (pointer && finePointer) {
         const v = Math.min(Math.abs(dy) / 60, 1);
-        press(pointer.x, pointer.y, 0.05 + 0.2 * v, 1.8 + v);
+        press(pointer.x, pointer.y, 0.05 + 0.2 * v, 1.8 + v, 0);
       }
     }
 
     /* ----- render: slope lighting, like light refracting through the surface ----- */
     function render() {
-      const d = img.data, c = cur, n = cols;
+      const d = img.data, c = sum, n = cols;
       const lr = light[0], lg = light[1], lb = light[2], dr = dark[0], dg = dark[1], db = dark[2];
       const k = SHADE * gain;
       let maxAbs = 0;
@@ -397,8 +415,8 @@
         const gx = Math.min(n - 2, Math.max(1, Math.round((f.x - sx) / CELL + 1)));
         const gy = Math.min(rows - 2, Math.max(1, Math.round((f.y - sy) / CELL + 1)));
         const idx = gy * n + gx;
-        const h = cur[idx];
-        const slx = cur[idx + 1] - cur[idx - 1], sly = cur[idx + n] - cur[idx - n];
+        const h = sum[idx];
+        const slx = sum[idx + 1] - sum[idx - 1], sly = sum[idx + n] - sum[idx - n];
         let dx = slx * WORD_G, dy = sly * WORD_G - h * WORD_L;
         if (dx > 9) dx = 9; else if (dx < -9) dx = -9;
         if (dy > 9) dy = 9; else if (dy < -9) dy = -9;
@@ -416,7 +434,7 @@
       tick++;
       if (maxAbs < 0.004) quiet++; else quiet = 0;
       if (quiet > 40) {
-        running = false; cur.fill(0); prev.fill(0); ctx.clearRect(0, 0, W, H); settleFloaters();
+        running = false; cur.forEach((b) => b.fill(0)); prev.forEach((b) => b.fill(0)); sum.fill(0); ctx.clearRect(0, 0, W, H); settleFloaters();
         return;
       }
       requestAnimationFrame(frame);
@@ -444,7 +462,7 @@
           const steps = Math.min(4, Math.max(1, Math.round(dist / 14)));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
-            press(lastMove.x + (x - lastMove.x) * t, lastMove.y + (y - lastMove.y) * t, amp / steps + amp * 0.5, 1.6 + Math.min(speed, 2) * 0.4);
+            press(lastMove.x + (x - lastMove.x) * t, lastMove.y + (y - lastMove.y) * t, amp / steps + amp * 0.5, 1.6 + Math.min(speed, 2) * 0.4, 0);
           }
         }
       }
