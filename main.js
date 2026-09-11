@@ -250,13 +250,17 @@
       const r = btn.getBoundingClientRect();
       const x = r.left + r.width / 2, y = r.top + r.height / 2;
       const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-      const vt = document.startViewTransition(() => apply(next));
+      let vt = null;
+      try { vt = document.startViewTransition(() => apply(next)); }
+      catch (err) { apply(next); return; }
       vt.ready.then(() => {
         root.animate(
           { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
           { duration: 750, easing: "cubic-bezier(0.22, 1, 0.36, 1)", pseudoElement: "::view-transition-new(root)" }
         );
-      });
+      }).catch(() => {});
+      vt.updateCallbackDone.catch(() => apply(next));
+      vt.finished.catch(() => { if (root.getAttribute("data-theme") !== (next === "light" ? "light" : null)) apply(next); });
     });
   }
 
