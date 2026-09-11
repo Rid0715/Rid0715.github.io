@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ridham Dholiya — Software Engineer</title>
-  <meta name="description" content="Ridham Dholiya — full-stack and distributed-systems engineer with 3.5+ years shipping high-availability platforms on Node.js, TypeScript and AWS, now building agentic AI products end-to-end.">
+  <meta name="description" content="Ridham Dholiya — full-stack, distributed-systems and Gen AI engineer with 3.5+ years shipping high-availability platforms on Node.js, TypeScript and AWS, now building agentic AI products end-to-end.">
   <meta property="og:title" content="Ridham Dholiya — Software Engineer">
   <meta property="og:description" content="Distributed systems, cloud reliability and agentic AI. I own systems end-to-end.">
   <meta property="og:type" content="website">
@@ -13,25 +13,29 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-weight='700' font-size='28' fill='%23fff'%3ERD%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+  <div class="cursor" aria-hidden="true"><div class="cursor-dot"></div><div class="cursor-ring"></div></div>
+  <div class="progress" aria-hidden="true"><i></i></div>
+  <div class="grain" aria-hidden="true"></div>
+
   <header class="nav" id="nav">
     <div class="nav-inner">
-      <a href="#top" class="brand" aria-label="Home">
+      <a href="#top" class="brand" aria-label="Home" data-magnetic>
         <span class="brand-mark">RD</span>
         <span class="brand-name">Ridham Dholiya</span>
       </a>
       <nav class="nav-links" aria-label="Primary">
-        <a href="#what">Expertise</a>
-        <a href="#work">Work</a>
-        <a href="#experience">Experience</a>
-        <a href="#skills">Skills</a>
-        <a href="#contact">Contact</a>
+        <a href="#what" data-nav="what">Expertise</a>
+        <a href="#work" data-nav="work">Work</a>
+        <a href="#experience" data-nav="experience">Experience</a>
+        <a href="#skills" data-nav="skills">Skills</a>
+        <a href="#contact" data-nav="contact">Contact</a>
       </nav>
-      <a class="nav-cta" href="assets/Ridham_Dholiya_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="nav-cta" href="assets/Ridham_Dholiya_Resume.pdf" target="_blank" rel="noopener" data-magnetic>Resume</a>
     </div>
   </header>
 
@@ -44,11 +48,15 @@
         <div class="hero-veil"></div>
       </div>
       <div class="hero-content">
-        <div class="avatar-wrap" data-hero>
-          <img class="avatar" src="assets/profile-512.jpg" alt="Portrait of Ridham Dholiya" width="160" height="160">
+        <button class="avatar-wrap" id="avatarBtn" data-hero type="button" aria-label="Open profile highlights">
+          <img class="avatar" id="avatarImg" src="assets/profile-512.jpg" alt="Portrait of Ridham Dholiya" width="160" height="160">
           <span class="avatar-ring" aria-hidden="true"></span>
-        </div>
-        <p class="eyebrow" data-hero>Ridham Dholiya &nbsp;·&nbsp; Full-stack &amp; distributed-systems engineer</p>
+          <span class="avatar-orbit" aria-hidden="true"></span>
+          <span class="avatar-hint" aria-hidden="true">tap</span>
+        </button>
+        <p class="eyebrow" data-hero>
+          <span>Ridham Dholiya</span><i>·</i><span>Full-stack</span><i>·</i><span>Distributed systems</span><i>·</i><span class="grad">Gen AI engineer</span>
+        </p>
         <h1 class="hero-title" data-hero>
           I build systems that <span class="grad">stay up</span><br class="br-desk">
           and agents that <span class="grad">get things done.</span>
@@ -59,31 +67,58 @@
           Now building agentic AI products end-to-end.
         </p>
         <div class="cta-row" data-hero>
-          <a class="btn btn-primary" href="#work">See my work</a>
-          <a class="btn btn-ghost" href="#contact">Get in touch</a>
+          <a class="btn btn-primary" href="#work" data-magnetic>See my work</a>
+          <a class="btn btn-ghost" href="#contact" data-magnetic>Get in touch</a>
         </div>
       </div>
       <div class="scroll-hint" aria-hidden="true"><span></span></div>
     </section>
 
-    <!-- STATS -->
-    <section class="stats" aria-label="Highlights">
-      <div class="container stats-grid">
-        <div class="stat" data-reveal>
-          <div class="stat-num"><span data-count="3.5" data-decimals="1">0</span>+</div>
-          <div class="stat-label">years shipping production software</div>
+    <!-- IDENTITY BURST (opened by clicking the avatar) -->
+    <div class="burst" id="burst" aria-hidden="true">
+      <div class="burst-bg"></div>
+      <svg class="burst-lines" id="burstLines" aria-hidden="true"></svg>
+      <div class="burst-center">
+        <div class="burst-photo-wrap">
+          <img class="burst-photo" id="burstPhoto" src="assets/profile.jpg" alt="">
+          <span class="burst-ring r1"></span>
+          <span class="burst-ring r2"></span>
         </div>
-        <div class="stat" data-reveal>
-          <div class="stat-num"><span data-count="300">0</span>+</div>
-          <div class="stat-label">hospitals on a system I own end-to-end</div>
-        </div>
-        <div class="stat" data-reveal>
-          <div class="stat-num"><span data-count="95">0</span>%</div>
-          <div class="stat-label">unit-test coverage on new backend code</div>
-        </div>
-        <div class="stat" data-reveal>
-          <div class="stat-num"><span data-count="0">0</span></div>
-          <div class="stat-label">manual steps to release to every hospital</div>
+        <p class="burst-name">Ridham Dholiya</p>
+        <p class="burst-role">Engineer who owns the system</p>
+      </div>
+      <div class="burst-labels" id="burstLabels"></div>
+      <button class="burst-close" id="burstClose" type="button" aria-label="Close">×</button>
+    </div>
+
+    <!-- QUOTES -->
+    <section class="quotes" aria-label="Principles">
+      <div class="container">
+        <div class="quote-stage" id="quoteStage">
+          <span class="quote-mark" aria-hidden="true">“</span>
+          <div class="quote-list">
+            <blockquote class="quote is-active">
+              <p>Innovation isn’t the idea. It’s the creative solution that survives production.</p>
+              <cite>on building</cite>
+            </blockquote>
+            <blockquote class="quote">
+              <p>Creative solutions come from understanding the whole system, not one layer of it.</p>
+              <cite>on architecture</cite>
+            </blockquote>
+            <blockquote class="quote">
+              <p>Scale is a design decision you make on day one, not a fire you fight on day one hundred.</p>
+              <cite>on distributed systems</cite>
+            </blockquote>
+            <blockquote class="quote">
+              <p>The best AI feature is the one the user never has to think about.</p>
+              <cite>on agentic AI</cite>
+            </blockquote>
+            <blockquote class="quote">
+              <p>Ownership means the pager, the pipeline and the outcome — not just the pull request.</p>
+              <cite>on ownership</cite>
+            </blockquote>
+          </div>
+          <div class="quote-dots" id="quoteDots" role="tablist" aria-label="Quotes"></div>
         </div>
       </div>
     </section>
@@ -102,11 +137,11 @@
       <div class="container">
         <div class="section-head" data-reveal>
           <p class="kicker">Expertise</p>
-          <h2>What I own.</h2>
+          <h2 data-split>What I own.</h2>
           <p class="sub">Three things I go deep on — and take responsibility for in production.</p>
         </div>
         <div class="pillar-grid">
-          <article class="pillar" data-reveal data-tilt>
+          <article class="pillar card" data-reveal data-tilt data-spot>
             <div class="pillar-icon" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="6" y="8" width="12" height="10" rx="3"/><rect x="30" y="8" width="12" height="10" rx="3"/>
@@ -121,7 +156,7 @@
             </ul>
           </article>
 
-          <article class="pillar" data-reveal data-tilt>
+          <article class="pillar card" data-reveal data-tilt data-spot>
             <div class="pillar-icon" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 34a8 8 0 0 1-1-16 11 11 0 0 1 21-3 8 8 0 0 1 2 19H14z"/>
@@ -135,7 +170,7 @@
             </ul>
           </article>
 
-          <article class="pillar" data-reveal data-tilt>
+          <article class="pillar card" data-reveal data-tilt data-spot>
             <div class="pillar-icon" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="24" cy="24" r="6"/><circle cx="24" cy="8" r="3"/><circle cx="24" cy="40" r="3"/><circle cx="8" cy="24" r="3"/><circle cx="40" cy="24" r="3"/>
@@ -157,14 +192,14 @@
       <div class="container">
         <div class="section-head" data-reveal>
           <p class="kicker">Selected work</p>
-          <h2>Products I’ve built and shipped.</h2>
+          <h2 data-split>Products I’ve built and shipped.</h2>
           <p class="sub">Live products with real users — designed, built and released end-to-end.</p>
         </div>
 
         <!-- IntuScribe -->
-        <article class="project project-lg" data-reveal>
+        <article class="project project-lg card" data-reveal data-spot>
           <div class="project-media">
-            <div class="browser-frame">
+            <div class="browser-frame" data-clip>
               <div class="browser-bar"><span></span><span></span><span></span><i>intuscribe.com</i></div>
               <img src="assets/intuscribe-hero.jpg" alt="IntuScribe landing page — AI Medical Scribe for Australian Clinicians" loading="lazy" data-parallax>
             </div>
@@ -187,15 +222,15 @@
               <li>React</li><li>TypeScript</li><li>Electron</li><li>Manifest V3</li><li>Firebase</li><li>Azure Speech</li><li>LangChain</li><li>GCP</li>
             </ul>
             <div class="project-links">
-              <a class="btn btn-primary btn-sm" href="https://intuscribe.com/" target="_blank" rel="noopener">Visit intuscribe.com <span aria-hidden="true">↗</span></a>
+              <a class="btn btn-primary btn-sm" href="https://intuscribe.com/" target="_blank" rel="noopener" data-magnetic>Visit intuscribe.com <span aria-hidden="true">↗</span></a>
             </div>
           </div>
         </article>
 
         <!-- GrowthOS -->
-        <article class="project project-lg project-flip" data-reveal>
+        <article class="project project-lg project-flip card" data-reveal data-spot>
           <div class="project-media">
-            <div class="agent-board" aria-label="Agent pipeline: crawl website, build strategy docs, connect analytics, run agents, human approval, publish">
+            <div class="agent-board" data-clip aria-label="Agent pipeline: crawl website, build strategy docs, connect analytics, run agents, human approval, publish">
               <div class="ab-row">
                 <div class="ab-node"><span class="ab-dot"></span>Crawl site</div>
                 <div class="ab-line"></div>
@@ -235,13 +270,13 @@
               <li>Next.js 16</li><li>React 19</li><li>TypeScript</li><li>Claude</li><li>Inngest</li><li>MongoDB</li><li>Tailwind v4</li><li>OAuth</li>
             </ul>
             <div class="project-links">
-              <a class="btn btn-ghost btn-sm" href="https://github.com/Rid0715/intuscribe-growthos" target="_blank" rel="noopener">View on GitHub <span aria-hidden="true">↗</span></a>
+              <a class="btn btn-ghost btn-sm" href="https://github.com/Rid0715/intuscribe-growthos" target="_blank" rel="noopener" data-magnetic>View on GitHub <span aria-hidden="true">↗</span></a>
             </div>
           </div>
         </article>
 
         <!-- EaseEmbro -->
-        <article class="project project-lg" data-reveal>
+        <article class="project project-lg card" data-reveal data-spot>
           <div class="project-media">
             <div class="phones">
               <img class="phone" src="assets/easeembro-1.jpg" alt="EaseEmbro Mobile screenshot" loading="lazy">
@@ -266,26 +301,26 @@
               <li>Android</li><li>Node.js</li><li>REST APIs</li><li>Real-time sync</li><li>Payroll engine</li>
             </ul>
             <div class="project-links">
-              <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=com.sampurnalabs.easeembro" target="_blank" rel="noopener">Get it on Google Play <span aria-hidden="true">↗</span></a>
+              <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=com.sampurnalabs.easeembro" target="_blank" rel="noopener" data-magnetic>Get it on Google Play <span aria-hidden="true">↗</span></a>
             </div>
           </div>
         </article>
 
         <!-- Smaller projects -->
         <div class="project-grid">
-          <article class="mini" data-reveal data-tilt>
+          <article class="mini card" data-reveal data-tilt data-spot>
             <p class="kicker">Microservices</p>
             <h4>E-commerce platform</h4>
             <p>Amazon-style platform split into product, auth, cart and order services. Kafka for async inter-service messaging, Redis caching, NestJS, MongoDB for catalogue and SQL for transactions.</p>
             <ul class="chips"><li>NestJS</li><li>Kafka</li><li>Redis</li><li>MongoDB</li><li>SQL</li></ul>
           </article>
-          <article class="mini" data-reveal data-tilt>
+          <article class="mini card" data-reveal data-tilt data-spot>
             <p class="kicker">Platform</p>
             <h4>Unibox</h4>
             <p>Centralised email management: one interface across Gmail, Microsoft and SMTP with scoped, role-based permissions so teams only see their own prospect lists.</p>
             <ul class="chips"><li>Express</li><li>MySQL</li><li>Redis</li><li>Gmail API</li><li>MS Graph</li></ul>
           </article>
-          <article class="mini" data-reveal data-tilt>
+          <article class="mini card" data-reveal data-tilt data-spot>
             <p class="kicker">Search</p>
             <h4>Learning Management System</h4>
             <p>Video-streaming LMS with a teacher analytics dashboard and recommendation-based search, powered by Apache Solr for fast, accurate results.</p>
@@ -300,7 +335,7 @@
       <div class="container">
         <div class="section-head" data-reveal>
           <p class="kicker">Experience</p>
-          <h2>Where I’ve owned systems.</h2>
+          <h2 data-split>Where I’ve owned systems.</h2>
         </div>
 
         <div class="timeline">
@@ -330,11 +365,16 @@
                 <h3>IntuScribe</h3>
                 <span class="job-date">May 2026 — Present</span>
               </div>
-              <p class="job-role">Founding Engineer · AI medical scribe</p>
+              <p class="job-role">Founding Engineer · AI medical scribe for clinicians</p>
               <ul class="job-points">
-                <li>Sole engineer across a Chrome extension, Electron desktop app and web app sharing one notes engine.</li>
-                <li>Real-time transcription (Azure Speech SDK), structured note generation, RAG over patient history, and direct EHR push.</li>
-                <li>Owned the full lifecycle: system design, release engineering, Chrome Web Store publishing, and HIPAA-aware privacy documentation.</li>
+                <li><b>Sole engineer</b> across a Chrome extension (React, TypeScript, Manifest V3), an Electron desktop app for Windows and a web app — all sharing one notes engine, IntuNotes.</li>
+                <li>Real-time consultation transcription with the Azure Speech SDK, tuned with specialty vocabulary for cardiology, psychology, physiotherapy and general practice.</li>
+                <li>One consult, many documents: structured clinical notes, referral letters, patient explainers and sick certificates generated together, with automatic extraction of follow-up tasks such as pathology orders and referrals.</li>
+                <li>RAG pipeline (LangChain + vector database) that grounds every note in prior consults, lab reports, referral letters and imaging results; a “Clinical Twin” learns each clinician’s voice and shorthand over time.</li>
+                <li><b>Push to EHR</b>: on-page field detection and auto-fill for Cliniko, Practice Fusion, athenahealth and SimplePractice, with dictation and clipboard fallbacks.</li>
+                <li>Auth and sync on Firebase (Google, Microsoft and Yahoo OAuth) across extension, desktop and web, including a custom protocol handler for desktop OAuth callbacks.</li>
+                <li>Security and compliance: AES-256 at rest, TLS 1.3 in transit, Australian data sovereignty on Google Cloud, HIPAA-aware data-handling policy and privacy documentation.</li>
+                <li>Owned the full lifecycle — system design, release engineering, Chrome Web Store publishing and store assets, pricing tiers and free-trial flow.</li>
               </ul>
             </div>
           </article>
@@ -388,7 +428,7 @@
           </article>
         </div>
 
-        <div class="edu" data-reveal>
+        <div class="edu card" data-reveal data-spot>
           <p class="kicker">Education</p>
           <p><b>B.Tech, Information Technology</b> — G. H. Patel College of Engineering &amp; Technology, Gujarat Technological University · 2019 – 2022 · CGPA 8.4</p>
         </div>
@@ -400,25 +440,32 @@
       <div class="container">
         <div class="section-head" data-reveal>
           <p class="kicker">Toolkit</p>
-          <h2>The stack I reach for.</h2>
+          <h2 data-split>The stack I reach for.</h2>
+          <p class="sub">Pick a category to see the tools inside it.</p>
         </div>
       </div>
-      <div class="marquee" aria-hidden="true">
+      <div class="marquee" id="marquee" aria-hidden="true">
         <div class="marquee-track">
           <span>TypeScript</span><span>Node.js</span><span>NestJS</span><span>Go</span><span>Python</span><span>React</span><span>Angular</span><span>Next.js</span><span>PostgreSQL</span><span>MongoDB</span><span>Redis</span><span>Kafka</span><span>RabbitMQ</span><span>Socket.IO</span><span>AWS</span><span>Kubernetes</span><span>Docker</span><span>Jenkins</span><span>Terraform</span><span>Grafana</span><span>Prometheus</span><span>LangChain</span><span>Claude</span><span>OpenAI</span><span>Gemini</span><span>Vector DBs</span><span>Jest</span><span>Solr</span>
           <span>TypeScript</span><span>Node.js</span><span>NestJS</span><span>Go</span><span>Python</span><span>React</span><span>Angular</span><span>Next.js</span><span>PostgreSQL</span><span>MongoDB</span><span>Redis</span><span>Kafka</span><span>RabbitMQ</span><span>Socket.IO</span><span>AWS</span><span>Kubernetes</span><span>Docker</span><span>Jenkins</span><span>Terraform</span><span>Grafana</span><span>Prometheus</span><span>LangChain</span><span>Claude</span><span>OpenAI</span><span>Gemini</span><span>Vector DBs</span><span>Jest</span><span>Solr</span>
         </div>
       </div>
       <div class="container">
-        <div class="skill-grid">
-          <div class="skill" data-reveal><h4>Languages</h4><p>TypeScript, JavaScript (ES6+), Go, Python, SQL</p></div>
-          <div class="skill" data-reveal><h4>Backend &amp; frameworks</h4><p>Node.js, Express, NestJS, Django, Socket.IO, REST APIs</p></div>
-          <div class="skill" data-reveal><h4>Frontend</h4><p>React (micro-frontends), Angular 15+, Next.js, Electron</p></div>
-          <div class="skill" data-reveal><h4>Data &amp; messaging</h4><p>PostgreSQL, MongoDB, MySQL, Redis, Solr, Kafka, RabbitMQ, vector databases</p></div>
-          <div class="skill" data-reveal><h4>Cloud &amp; DevOps</h4><p>AWS (EC2, S3, RDS, Lambda, IAM, CloudWatch), GCP, Docker, Kubernetes, Jenkins, Terraform, Prometheus, Grafana</p></div>
-          <div class="skill" data-reveal><h4>AI engineering</h4><p>Claude, OpenAI, Gemini, Sarvam AI, LangChain, RAG pipelines, Inngest agent jobs, Claude Code</p></div>
-          <div class="skill" data-reveal><h4>Practices</h4><p>System design (HLD/LLD), TDD with Jest &amp; Supertest, Agile/Scrum, code review, performance &amp; security</p></div>
-          <div class="skill" data-reveal><h4>Currently learning</h4><p>Snowflake, Playwright automation, Java Spring Boot</p></div>
+        <div class="skill-grid" id="skillGrid" role="tablist" aria-label="Skill categories">
+          <button class="skill card is-active" role="tab" aria-selected="true" data-spot data-cat="languages"><h4>Languages</h4><p>TypeScript, JavaScript (ES6+), Go, Python, SQL</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="backend"><h4>Backend &amp; frameworks</h4><p>Node.js, Express, NestJS, Django, Socket.IO, REST APIs</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="frontend"><h4>Frontend</h4><p>React (micro-frontends), Angular 15+, Next.js, Electron</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="data"><h4>Data &amp; messaging</h4><p>PostgreSQL, MongoDB, MySQL, Redis, Solr, Kafka, RabbitMQ, vector databases</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="cloud"><h4>Cloud &amp; DevOps</h4><p>AWS, GCP, Docker, Kubernetes, Jenkins, Terraform, Prometheus, Grafana</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="ai"><h4>AI engineering</h4><p>Claude, OpenAI, Gemini, Sarvam AI, LangChain, RAG, Inngest, Claude Code</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="practices"><h4>Practices</h4><p>System design, TDD with Jest &amp; Supertest, Agile/Scrum, code review, security</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="learning"><h4>Currently learning</h4><p>Snowflake, Playwright automation, Java Spring Boot</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+        </div>
+        <div class="skill-panel" id="skillPanel" role="tabpanel">
+          <div class="skill-panel-inner">
+            <div class="skill-panel-head"><h4 id="skillPanelTitle">Languages</h4><p id="skillPanelSub"></p></div>
+            <div class="logo-grid" id="logoGrid"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -430,9 +477,40 @@
         <h2 class="contact-title" data-reveal>Let’s build something<br>that <span class="grad">lasts.</span></h2>
         <p class="sub" data-reveal>Open to senior full-stack, backend and AI-engineering roles — hybrid or relocation.</p>
         <div class="contact-row" data-reveal>
-          <a class="btn btn-primary" href="mailto:rdj070102@gmail.com">rdj070102@gmail.com</a>
-          <a class="btn btn-ghost" href="https://www.linkedin.com/in/ridham-dholiya-481b83245/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a>
-          <a class="btn btn-ghost" href="https://github.com/Rid0715" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-primary" href="mailto:rdj070102@gmail.com" data-magnetic>rdj070102@gmail.com</a>
+          <a class="btn btn-ghost" href="tel:+919824190869" data-magnetic>+91 98241 90869</a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/ridham-dholiya-481b83245/" target="_blank" rel="noopener" data-magnetic>LinkedIn <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-ghost" href="https://github.com/Rid0715" target="_blank" rel="noopener" data-magnetic>GitHub <span aria-hidden="true">↗</span></a>
+        </div>
+
+        <div class="dm card" data-reveal data-spot>
+          <div class="dm-head">
+            <p class="kicker">Send a direct message</p>
+            <h3>Type your message and choose how to send it.</h3>
+            <p class="dm-sub">Nothing is stored here — your message opens in Gmail or your mail app, or you can copy it.</p>
+          </div>
+          <form class="dm-form" id="dmForm" novalidate>
+            <div class="dm-row">
+              <label class="field">
+                <span>Your name</span>
+                <input type="text" id="dmName" name="name" placeholder="e.g. Hiring Manager / Recruiter" autocomplete="name">
+              </label>
+              <label class="field">
+                <span>Your email</span>
+                <input type="email" id="dmEmail" name="email" placeholder="e.g. recruiter@company.com" autocomplete="email">
+              </label>
+            </div>
+            <label class="field">
+              <span>Message</span>
+              <textarea id="dmMessage" name="message" rows="5" placeholder="Hi Ridham, we reviewed your distributed-systems and AI background and would love to discuss a Senior / Lead Engineer role..."></textarea>
+            </label>
+            <div class="dm-actions">
+              <button type="button" class="btn btn-primary" id="dmGmail" data-magnetic>Send via Gmail <span aria-hidden="true">↗</span></button>
+              <button type="button" class="btn btn-ghost" id="dmMail" data-magnetic>Default mail app</button>
+              <button type="button" class="btn btn-ghost" id="dmCopy" data-magnetic>Copy message text</button>
+            </div>
+            <p class="dm-status" id="dmStatus" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </section>
@@ -442,7 +520,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <span>© <span id="year"></span> Ridham Dholiya</span>
-      <span>Gujarat, India · Designed &amp; built by me</span>
+      <span>Gujarat, India · Designed &amp; built by me · v1.2</span>
     </div>
   </footer>
 
