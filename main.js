@@ -440,7 +440,7 @@
     // Touching a card (tap or click inside it) makes a small drop; the background stays still
     document.addEventListener("pointerdown", (e) => {
       if (e.button !== undefined && e.button !== 0) return;
-      if (!(e.target && e.target.closest && e.target.closest(".card"))) return;
+      if (!(e.target && e.target.closest && e.target.closest(".card, [data-water]"))) return;
       drop(e.clientX, e.clientY, 0.5);
     }, { passive: true });
 
@@ -452,7 +452,7 @@
         const dt = Math.max(8, now - lastMove.t);
         const dist = Math.hypot(x - lastMove.x, y - lastMove.y);
         const speed = dist / dt; // px per ms
-        const inCard = !!(e.target && e.target.closest && e.target.closest(".card"));
+        const inCard = !!(e.target && e.target.closest && e.target.closest(".card, [data-water]"));
         if (dist > 2 && inCard) {
           const amp = 0.028 + Math.min(speed, 2) * 0.03;
           const steps = Math.min(4, Math.max(1, Math.round(dist / 14)));

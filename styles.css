@@ -650,6 +650,7 @@ html.theming, html.theming * { transition: background-color 0.5s ease, color 0.5
 .contact .sub { margin-inline: auto; }
 .contact-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
 .contact-row .btn svg { flex: none; }
+.contact-row .btn { z-index: 1; }
 
 /* ============ Footer ============ */
 .footer { padding: 30px 0 40px; border-top: 1px solid var(--line); color: var(--text-3); font-size: 13px; }
