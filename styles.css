@@ -144,7 +144,7 @@ p { margin: 0; }
     radial-gradient(ellipse 70% 60% at 50% 45%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 60%, rgba(0,0,0,0.95) 100%),
     linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.9) 85%, #000 100%);
 }
-.hero-content { position: relative; z-index: 1; text-align: center; width: min(960px, 100% - 40px); }
+.hero-content { position: relative; z-index: 1; text-align: center; width: min(1040px, 100% - 40px); }
 .avatar-wrap { position: relative; width: 132px; height: 132px; margin: 0 auto 28px; }
 .avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 30%; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
 .avatar-ring {
@@ -154,7 +154,7 @@ p { margin: 0; }
 .avatar-ring::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #000; }
 .eyebrow { font-size: 14px; font-weight: 500; letter-spacing: 0.02em; color: var(--text-2); margin-bottom: 22px; }
 .hero-title {
-  font-size: clamp(38px, 7vw, 88px);
+  font-size: clamp(38px, 6.3vw, 80px);
   font-weight: 700; letter-spacing: -0.035em; line-height: 1.02;
   text-wrap: balance;
 }
@@ -262,7 +262,7 @@ p { margin: 0; }
 .ab-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
 .ab-gate .ab-dot { background: var(--accent-3); }
 .ab-gate { border-color: rgba(255,184,107,0.4); }
-.ab-line { flex: 0 0 18px; height: 1px; background: linear-gradient(90deg, var(--line-2), rgba(255,255,255,0.3)); }
+.ab-line { flex: 0 0 14px; height: 1px; background: linear-gradient(90deg, var(--line-2), rgba(255,255,255,0.3)); }
 .ab-center { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .ab-agent {
   padding: 14px 14px; border-radius: 14px; background: rgba(124,216,255,0.06); border: 1px solid rgba(124,216,255,0.18);
