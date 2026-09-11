@@ -286,9 +286,9 @@
     function show() {
       if (open) return;
       open = true;
-      layout();
       burst.classList.add("is-open");
       burst.setAttribute("aria-hidden", "false");
+      layout();
       if (lenis) lenis.stop();
       document.body.style.overflow = "hidden";
       if (!animated) return;
