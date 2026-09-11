@@ -331,7 +331,7 @@
     }
     // a drop is a wave train: one strong leading crest, then weaker waves that trail and fade
     function drop(x, y, strength) {
-      const amp = 0.32 + 0.4 * strength, r = 1.6 + 2.4 * strength;
+      const amp = 0.24 + 0.32 * strength, r = 1.6 + 2.2 * strength;
       press(x, y, amp, r, 0);
       const train = [[90, 0.5], [210, 0.28], [350, 0.15], [520, 0.07]];
       train.forEach(([delay, k]) => setTimeout(() => press(x, y, amp * k, r * 0.9, 1), delay));
@@ -437,10 +437,11 @@
     }
 
     /* ----- input ----- */
-    // A drop wherever you click or tap
+    // Touching a card (tap or click inside it) makes a small drop; the background stays still
     document.addEventListener("pointerdown", (e) => {
       if (e.button !== undefined && e.button !== 0) return;
-      drop(e.clientX, e.clientY, 1);
+      if (!(e.target && e.target.closest && e.target.closest(".card"))) return;
+      drop(e.clientX, e.clientY, 0.5);
     }, { passive: true });
 
     // Moving the cursor (or a finger) drags through the water: a wake that follows the path
@@ -453,7 +454,7 @@
         const speed = dist / dt; // px per ms
         const inCard = !!(e.target && e.target.closest && e.target.closest(".card"));
         if (dist > 2 && inCard) {
-          const amp = 0.035 + Math.min(speed, 2) * 0.04;
+          const amp = 0.028 + Math.min(speed, 2) * 0.03;
           const steps = Math.min(4, Math.max(1, Math.round(dist / 14)));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
@@ -472,7 +473,7 @@
     const schedule = () => {
       clearTimeout(ambient);
       ambient = setTimeout(() => {
-        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.2 + Math.random() * 0.3);
+        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.15 + Math.random() * 0.25);
         schedule();
       }, 5000 + Math.random() * 5000);
     };
