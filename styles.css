@@ -152,6 +152,19 @@ html.theming, html.theming * { transition: background-color 0.5s ease, color 0.5
 .card { z-index: 1; }
 .reduced .ripples { display: none; }
 
+/* Text focus inside cards: the block under the cursor grows slightly and gains full contrast */
+.card h3, .card h4, .card p, .card .project-tag, .card .chips {
+  transform-origin: left center;
+  transition: transform 0.5s var(--ease), color 0.35s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .card p:hover { transform: scale(1.025); color: var(--text); }
+  .card .project-tag:hover { transform: scale(1.02); color: var(--heading); }
+  .card h3:hover, .card h4:hover { transform: scale(1.03); }
+  .card .chips:hover { transform: scale(1.02); }
+  .card .kicker:hover { transform: none; }
+}
+
 /* Words that float on the water surface */
 .fl { display: inline-block; will-change: transform; }
 
