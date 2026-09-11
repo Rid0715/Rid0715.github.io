@@ -271,8 +271,13 @@
         svg.appendChild(dotEl);
         const label = document.createElement("div");
         label.className = "burst-label"; label.innerHTML = text;
-        label.style.left = `${lx}px`; label.style.top = `${ly}px`;
         labelsWrap.appendChild(label);
+        const half = label.offsetWidth / 2 + 12;
+        const clx = Math.min(Math.max(lx, half), W - half);
+        label.style.left = `${clx}px`; label.style.top = `${ly}px`;
+        line.setAttribute("x2", clx);
+        const len2 = Math.hypot(clx - sx, ly - sy);
+        line.style.strokeDasharray = len2; line.style.strokeDashoffset = animated ? len2 : 0;
       });
       burst.style.setProperty("--cy", `${cy}px`);
       burst.querySelector(".burst-center").style.transform = `translateY(${cy - H / 2 + 20}px)`;
