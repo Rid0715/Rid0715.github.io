@@ -34,6 +34,7 @@
 
   /* ============ Always-on features ============ */
   setupTheme();
+  setupRipples();
   setupNav();
   setupSkills();
   setupQuotes();
@@ -234,6 +235,94 @@
       vt.updateCallbackDone.catch(() => apply(next));
       vt.finished.catch(() => { if (root.getAttribute("data-theme") !== (next === "light" ? "light" : null)) apply(next); });
     });
+  }
+
+  /* ---------- Water ripples ---------- */
+  function setupRipples() {
+    const canvas = document.getElementById("ripples");
+    if (!canvas || reduced) return;
+    const ctx = canvas.getContext("2d");
+    const drops = [];
+    let W = 0, H = 0, dpr = 1, raf = null;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
+
+    function color() {
+      const cs = getComputedStyle(document.documentElement);
+      return { rgb: (cs.getPropertyValue("--ripple") || "255,255,255").trim(), a: parseFloat(cs.getPropertyValue("--ripple-alpha")) || 0.2 };
+    }
+
+    function drop(x, y, strength) {
+      drops.push({ x, y, t0: performance.now(), s: strength, c: color() });
+      if (drops.length > 24) drops.shift();
+      if (!raf) raf = requestAnimationFrame(frame);
+    }
+
+    function frame(now) {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = drops.length - 1; i >= 0; i--) {
+        const d = drops[i];
+        const life = 1900 * (0.7 + d.s * 0.5);
+        const p = (now - d.t0) / life;
+        if (p >= 1) { drops.splice(i, 1); continue; }
+        const ease = 1 - Math.pow(1 - p, 2.4);
+        const maxR = 120 + 240 * d.s;
+        const fade = Math.pow(1 - p, 1.5);
+        // three rings trailing each other, thinning as they travel
+        for (let k = 0; k < 3; k++) {
+          const r = ease * maxR - k * (16 + 10 * d.s);
+          if (r <= 1) continue;
+          const alpha = d.c.a * fade * (1 - k * 0.3);
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
+          ctx.lineWidth = Math.max(0.5, (1.8 - k * 0.45) * (1 - p * 0.6));
+          ctx.strokeStyle = `rgba(${d.c.rgb}, ${alpha.toFixed(3)})`;
+          ctx.stroke();
+        }
+        // the impact: a soft glow that disappears quickly
+        if (p < 0.35) {
+          const g = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, 26 + 40 * d.s);
+          const ga = d.c.a * 0.9 * (1 - p / 0.35);
+          g.addColorStop(0, `rgba(${d.c.rgb}, ${ga.toFixed(3)})`);
+          g.addColorStop(1, `rgba(${d.c.rgb}, 0)`);
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(d.x, d.y, 26 + 40 * d.s, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      raf = drops.length ? requestAnimationFrame(frame) : null;
+    }
+
+    // A drop wherever you click or tap
+    document.addEventListener("pointerdown", (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      drop(e.clientX, e.clientY, 1);
+    }, { passive: true });
+
+    // A lighter drop when the cursor lands on a card
+    if (finePointer) {
+      document.querySelectorAll(".card").forEach((card) => {
+        card.addEventListener("pointerenter", (e) => drop(e.clientX, e.clientY, 0.55));
+      });
+    }
+
+    // Ambient rain: a faint drop somewhere every few seconds
+    let ambient = null;
+    const schedule = () => {
+      clearTimeout(ambient);
+      ambient = setTimeout(() => {
+        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.35 + Math.random() * 0.25);
+        schedule();
+      }, 4500 + Math.random() * 4500);
+    };
+    schedule();
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
   }
 
   function setupNav() {

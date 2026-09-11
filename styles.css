@@ -37,6 +37,8 @@
   --chip-bg: rgba(255, 255, 255, 0.04);
   --chip-line: rgba(255, 255, 255, 0.08);
   --card-shadow: rgba(0, 0, 0, 0.35);
+  --ripple: 255, 255, 255;
+  --ripple-alpha: 0.2;
   --radius: 28px;
   --radius-sm: 16px;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -62,6 +64,8 @@
   --chip-bg: rgba(10, 132, 255, 0.06);
   --chip-line: rgba(10, 132, 255, 0.18);
   --card-shadow: rgba(10, 132, 255, 0.14);
+  --ripple: 10, 132, 255;
+  --ripple-alpha: 0.26;
   --accent: #0a84ff;
   --accent-2: #ff2d75;
   --accent-3: #ff8a00;
@@ -140,6 +144,11 @@ button { font: inherit; color: inherit; }
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) { z-index: 9999; }
 html.theming, html.theming * { transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease !important; }
+
+/* ============ Water ripples (drops on still water, behind the cards) ============ */
+.ripples { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.card { z-index: 1; }
+.reduced .ripples { display: none; }
 
 /* ============ Cursor, progress, grain ============ */
 .cursor { position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: none; }
