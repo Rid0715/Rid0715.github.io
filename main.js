@@ -261,7 +261,7 @@
 
     function drop(x, y, strength) {
       drops.push({ x, y, t0: performance.now(), s: strength, c: color() });
-      if (drops.length > 24) drops.shift();
+      if (drops.length > 40) drops.shift();
       if (!raf) raf = requestAnimationFrame(frame);
     }
 
@@ -305,10 +305,18 @@
       drop(e.clientX, e.clientY, 1);
     }, { passive: true });
 
-    // A lighter drop when the cursor lands on a card
+    // Drops keep falling while the cursor moves inside a card
     if (finePointer) {
       document.querySelectorAll(".card").forEach((card) => {
-        card.addEventListener("pointerenter", (e) => drop(e.clientX, e.clientY, 0.55));
+        let lx = 0, ly = 0, lt = 0;
+        card.addEventListener("pointerenter", (e) => { lx = e.clientX; ly = e.clientY; lt = performance.now(); drop(e.clientX, e.clientY, 0.55); });
+        card.addEventListener("pointermove", (e) => {
+          const now = performance.now();
+          const dist = Math.hypot(e.clientX - lx, e.clientY - ly);
+          if (dist < 34 || now - lt < 110) return;
+          lx = e.clientX; ly = e.clientY; lt = now;
+          drop(e.clientX, e.clientY, 0.28 + Math.min(dist, 120) / 400);
+        }, { passive: true });
       });
     }
 
