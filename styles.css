@@ -613,10 +613,11 @@ html.theming, html.theming * { transition: background-color 0.5s ease, color 0.5
 @media (max-width: 1000px) { .skill-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 520px) { .skill-grid { grid-template-columns: 1fr; } }
 
-.skill-panel { overflow: hidden; height: 0; }
+.skill-panel { overflow: hidden; height: 0; position: relative; z-index: 1; }
 .skill-panel-inner { margin-top: 18px; padding: 30px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--accent-line-soft); }
 .skill-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
 .skill-panel-head h4 { font-size: 22px; color: var(--title); }
+.skill-panel-inner h4:hover, .skill-panel-inner p:hover { transform: none; }
 .skill-panel-head p { color: var(--text-3); font-size: 14px; }
 .logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px; }
 .logo-tile {
