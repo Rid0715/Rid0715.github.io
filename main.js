@@ -331,7 +331,7 @@
     }
     // a drop is a wave train: one strong leading crest, then weaker waves that trail and fade
     function drop(x, y, strength) {
-      const amp = 0.55 + 0.75 * strength, r = 1.6 + 2.6 * strength;
+      const amp = 0.32 + 0.4 * strength, r = 1.6 + 2.4 * strength;
       press(x, y, amp, r, 0);
       const train = [[90, 0.5], [210, 0.28], [350, 0.15], [520, 0.07]];
       train.forEach(([delay, k]) => setTimeout(() => press(x, y, amp * k, r * 0.9, 1), delay));
@@ -373,10 +373,6 @@
           if (shift > 0) { c.copyWithin(0, n); pr.copyWithin(0, n); c.fill(0, c.length - n); pr.fill(0, pr.length - n); }
           else { c.copyWithin(n, 0, c.length - n); pr.copyWithin(n, 0, pr.length - n); c.fill(0, 0, n); pr.fill(0, 0, n); }
         }
-      }
-      if (pointer && finePointer) {
-        const v = Math.min(Math.abs(dy) / 60, 1);
-        press(pointer.x, pointer.y, 0.05 + 0.2 * v, 1.8 + v, 0);
       }
     }
 
@@ -455,10 +451,9 @@
         const dt = Math.max(8, now - lastMove.t);
         const dist = Math.hypot(x - lastMove.x, y - lastMove.y);
         const speed = dist / dt; // px per ms
-        if (dist > 2) {
-          const inCard = !!(e.target && e.target.closest && e.target.closest(".card"));
-          const base = inCard ? 0.05 : 0.03;
-          const amp = base + Math.min(speed, 2) * (inCard ? 0.06 : 0.04);
+        const inCard = !!(e.target && e.target.closest && e.target.closest(".card"));
+        if (dist > 2 && inCard) {
+          const amp = 0.035 + Math.min(speed, 2) * 0.04;
           const steps = Math.min(4, Math.max(1, Math.round(dist / 14)));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
@@ -472,17 +467,6 @@
     document.addEventListener("pointerleave", () => { pointer = null; lastMove = null; });
     document.addEventListener("pointerup", () => { lastMove = null; });
 
-    // Ambient rain: a faint drop somewhere every few seconds
-    let ambient = null;
-    const schedule = () => {
-      clearTimeout(ambient);
-      ambient = setTimeout(() => {
-        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.25 + Math.random() * 0.3);
-        schedule();
-      }, 5000 + Math.random() * 5000);
-    };
-    schedule();
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
     // keep the water moving with the page even while idle
     window.addEventListener("scroll", () => { if (!running) lastScroll = window.scrollY; }, { passive: true });
   }
