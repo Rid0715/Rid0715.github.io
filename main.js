@@ -467,6 +467,17 @@
     document.addEventListener("pointerleave", () => { pointer = null; lastMove = null; });
     document.addEventListener("pointerup", () => { lastMove = null; });
 
+    // Ambient rain: a faint drop somewhere every few seconds
+    let ambient = null;
+    const schedule = () => {
+      clearTimeout(ambient);
+      ambient = setTimeout(() => {
+        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.2 + Math.random() * 0.3);
+        schedule();
+      }, 5000 + Math.random() * 5000);
+    };
+    schedule();
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
     // keep the water moving with the page even while idle
     window.addEventListener("scroll", () => { if (!running) lastScroll = window.scrollY; }, { passive: true });
   }
