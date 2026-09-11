@@ -376,7 +376,7 @@
     let current = null;
 
     function tile([name, slug]) {
-      const initials = name.split(/[\s./]+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+      const initials = name.length <= 4 ? name.toUpperCase() : name.split(/[\s./]+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
       const media = slug
         ? `<img class="mono" src="https://cdn.simpleicons.org/${slug}/f5f5f7" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<div class=&quot;mono-fallback&quot;>${initials}</div>'"><img class="color" src="https://cdn.simpleicons.org/${slug}" alt="" loading="lazy" onerror="this.remove()">`
         : `<div class="mono-fallback">${initials}</div>`;
