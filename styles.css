@@ -40,6 +40,9 @@
   --card-hover: #1b1b1f;
   --ripple: 255, 255, 255;
   --ripple-alpha: 0.2;
+  --water-light: 255, 255, 255;
+  --water-dark: 0, 0, 0;
+  --water-gain: 0.55;
   --radius: 28px;
   --radius-sm: 16px;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -68,6 +71,9 @@
   --card-hover: #ffffff;
   --ripple: 10, 132, 255;
   --ripple-alpha: 0.26;
+  --water-light: 255, 255, 255;
+  --water-dark: 10, 132, 255;
+  --water-gain: 0.75;
   --accent: #0a84ff;
   --accent-2: #ff2d75;
   --accent-3: #ff8a00;

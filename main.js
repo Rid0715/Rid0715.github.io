@@ -237,28 +237,41 @@
     });
   }
 
-  /* ---------- Water: ripples in the background, text floats on the surface ---------- */
+  /* ---------- Water: a simulated surface (wave equation on a height field) ---------- */
   function setupRipples() {
     const canvas = document.getElementById("ripples");
     if (!canvas || reduced) return;
-    const ctx = canvas.getContext("2d");
-    const drops = [];
-    let W = 0, H = 0, dpr = 1, raf = null;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    const CELL = 6;            // simulation cell size in CSS px
+    const DAMP = 0.986;        // energy loss per step (water viscosity)
+    const SHADE = 4.2;         // slope -> light intensity
+    const WORD_G = 46;         // slope -> word displacement (px)
+    const WORD_L = 7;          // height -> word lift (px)
+    let W = 0, H = 0, cols = 0, rows = 0, cur, prev, off, octx, img, running = false, quiet = 0, tick = 0;
+    let lastScroll = window.scrollY, scrollAcc = 0, pointer = null, lastMove = null;
+    let light = [255, 255, 255], dark = [0, 0, 0], gain = 1;
+
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      const parse = (v, d) => { const m = (cs.getPropertyValue(v) || "").split(",").map((n) => parseFloat(n)); return m.length === 3 && !m.some(isNaN) ? m : d; };
+      light = parse("--water-light", [255, 255, 255]);
+      dark = parse("--water-dark", [0, 0, 0]);
+      gain = parseFloat(cs.getPropertyValue("--water-gain")) || 1;
+    }
+    readColors();
+    new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
     function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = window.innerWidth; H = window.innerHeight;
-      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cols = Math.ceil(W / CELL) + 2; rows = Math.ceil(H / CELL) + 2;
+      cur = new Float32Array(cols * rows); prev = new Float32Array(cols * rows);
+      off = document.createElement("canvas"); off.width = cols; off.height = rows;
+      octx = off.getContext("2d"); img = octx.createImageData(cols, rows);
+      canvas.width = W; canvas.height = H;
       cacheDirty = true;
     }
 
-    function color() {
-      const cs = getComputedStyle(document.documentElement);
-      return { rgb: (cs.getPropertyValue("--ripple") || "255,255,255").trim(), a: parseFloat(cs.getPropertyValue("--ripple-alpha")) || 0.2 };
-    }
-
-    /* ----- floaters: words on the background that ride the waves ----- */
+    /* ----- floaters: words on the background that ride the surface ----- */
     const FLOAT_SPLIT = [
       ".section-head .sub", ".section-head .kicker", ".lede",
       ".job-head h3", ".job-date", ".job-role", ".job-points li",
@@ -290,121 +303,170 @@
       });
       cacheDirty = false; lastCache = performance.now();
     }
+    function settleFloaters() { floaters.forEach((f) => { if (f.moved) { f.el.style.transform = ""; f.moved = false; } }); }
+
     window.addEventListener("resize", resize, { passive: true });
     window.addEventListener("load", () => { cacheDirty = true; });
+    document.addEventListener("click", () => { cacheDirty = true; }, true);
     resize();
 
-    /* ----- drops (stored in page coordinates so scrolling keeps everything aligned) ----- */
-    function drop(cx, cy, strength) {
-      drops.push({ x: cx + window.scrollX, y: cy + window.scrollY, t0: performance.now(), s: strength, c: color() });
-      if (drops.length > 40) drops.shift();
-      if (!raf) raf = requestAnimationFrame(frame);
+    /* ----- disturbing the surface ----- */
+    function press(x, y, amp, radius) {
+      // push the surface down with a smooth bump; the wave equation does the rest
+      const cx = x / CELL + 1, cy = y / CELL + 1;
+      const r = Math.max(1.2, radius), r2 = r * r;
+      const x0 = Math.max(1, Math.floor(cx - r)), x1 = Math.min(cols - 2, Math.ceil(cx + r));
+      const y0 = Math.max(1, Math.floor(cy - r)), y1 = Math.min(rows - 2, Math.ceil(cy + r));
+      for (let yy = y0; yy <= y1; yy++) {
+        for (let xx = x0; xx <= x1; xx++) {
+          const dx = xx - cx, dy = yy - cy, d2 = dx * dx + dy * dy;
+          if (d2 > r2) continue;
+          cur[yy * cols + xx] -= amp * Math.exp(-3 * d2 / r2);
+        }
+      }
+      if (!running) { running = true; quiet = 0; requestAnimationFrame(frame); }
+    }
+    const drop = (x, y, strength) => press(x, y, 0.55 + 0.75 * strength, 1.6 + 2.6 * strength);
+
+    /* ----- physics step: next = average of neighbours * 2 - previous, damped ----- */
+    function step() {
+      const c = cur, pr = prev, n = cols;
+      for (let y = 1; y < rows - 1; y++) {
+        let i = y * n + 1;
+        for (let x = 1; x < n - 1; x++, i++) {
+          const v = ((c[i - 1] + c[i + 1] + c[i - n] + c[i + n]) * 0.5 - pr[i]) * DAMP;
+          pr[i] = v;
+        }
+      }
+      // edges absorb a little so waves do not ring forever
+      for (let x = 0; x < n; x++) { pr[x] = pr[n + x] * 0.5; pr[(rows - 1) * n + x] = pr[(rows - 2) * n + x] * 0.5; }
+      for (let y = 0; y < rows; y++) { pr[y * n] = pr[y * n + 1] * 0.5; pr[y * n + n - 1] = pr[y * n + n - 2] * 0.5; }
+      const t = cur; cur = prev; prev = t;
     }
 
-    // ring phases: first crest strongest, then lighter, then faint
-    const PHASES = [1, 0.55, 0.3];
-    function frame(now) {
-      if (cacheDirty || now - lastCache > 1500) cacheFloaters();
-      const sy = window.scrollY, sx = window.scrollX;
-      ctx.clearRect(0, 0, W, H);
-
-      const live = [];
-      for (let i = drops.length - 1; i >= 0; i--) {
-        const d = drops[i];
-        const life = 2000 * (0.7 + d.s * 0.5);
-        const p = (now - d.t0) / life;
-        if (p >= 1) { drops.splice(i, 1); continue; }
-        const ease = 1 - Math.pow(1 - p, 2.4);
-        const maxR = 130 + 260 * d.s;
-        const fade = Math.pow(1 - p, 1.5);
-        const spacing = 18 + 12 * d.s;
-        const rings = [];
-        const vx = d.x - sx, vy = d.y - sy;
-        for (let k = 0; k < 3; k++) {
-          const r = ease * maxR - k * spacing;
-          if (r <= 1) continue;
-          rings.push({ r, amp: PHASES[k] });
-          if (vx < -maxR || vx > W + maxR || vy < -maxR || vy > H + maxR) continue;
-          ctx.beginPath();
-          ctx.arc(vx, vy, r, 0, Math.PI * 2);
-          ctx.lineWidth = Math.max(0.5, (1.9 - k * 0.5) * (1 - p * 0.6));
-          ctx.strokeStyle = `rgba(${d.c.rgb}, ${(d.c.a * fade * PHASES[k]).toFixed(3)})`;
-          ctx.stroke();
-        }
-        if (p < 0.35 && vx > -80 && vx < W + 80 && vy > -80 && vy < H + 80) {
-          const gr = 26 + 40 * d.s;
-          const g = ctx.createRadialGradient(vx, vy, 0, vx, vy, gr);
-          const ga = d.c.a * 0.9 * (1 - p / 0.35);
-          g.addColorStop(0, `rgba(${d.c.rgb}, ${ga.toFixed(3)})`);
-          g.addColorStop(1, `rgba(${d.c.rgb}, 0)`);
-          ctx.fillStyle = g;
-          ctx.beginPath(); ctx.arc(vx, vy, gr, 0, Math.PI * 2); ctx.fill();
-        }
-        live.push({ x: d.x, y: d.y, rings, amp: 7 * d.s * fade, reach: maxR + 60 });
+    /* ----- the page scrolls: the water moves with it (and the cursor drags through it) ----- */
+    function applyScroll() {
+      const sy = window.scrollY, dy = sy - lastScroll; lastScroll = sy;
+      if (!dy) return;
+      scrollAcc += dy;
+      const shift = Math.trunc(scrollAcc / CELL);
+      if (shift) {
+        scrollAcc -= shift * CELL;
+        const n = Math.min(Math.abs(shift), rows - 2) * cols;
+        if (shift > 0) { cur.copyWithin(0, n); prev.copyWithin(0, n); cur.fill(0, cur.length - n); prev.fill(0, prev.length - n); }
+        else { cur.copyWithin(n, 0, cur.length - n); prev.copyWithin(n, 0, prev.length - n); cur.fill(0, 0, n); prev.fill(0, 0, n); }
       }
+      if (pointer && finePointer) {
+        const v = Math.min(Math.abs(dy) / 60, 1);
+        press(pointer.x, pointer.y, 0.05 + 0.2 * v, 1.8 + v);
+      }
+    }
 
-      /* words near a passing crest get lifted outward, then settle back */
-      const top = sy - 300, bottom = sy + H + 300;
+    /* ----- render: slope lighting, like light refracting through the surface ----- */
+    function render() {
+      const d = img.data, c = cur, n = cols;
+      const lr = light[0], lg = light[1], lb = light[2], dr = dark[0], dg = dark[1], db = dark[2];
+      const k = SHADE * gain;
+      let maxAbs = 0;
+      for (let y = 1; y < rows - 1; y++) {
+        for (let x = 1; x < n - 1; x++) {
+          const i = y * n + x;
+          const h = c[i];
+          if (h > maxAbs) maxAbs = h; else if (-h > maxAbs) maxAbs = -h;
+          const sl = (c[i + 1] - c[i - 1] + c[i + n] - c[i - n]) * k;
+          const o = i * 4;
+          if (sl > 0.004) { d[o] = lr; d[o + 1] = lg; d[o + 2] = lb; d[o + 3] = Math.min(255, sl * 255) | 0; }
+          else if (sl < -0.004) { d[o] = dr; d[o + 1] = dg; d[o + 2] = db; d[o + 3] = Math.min(255, -sl * 255) | 0; }
+          else d[o + 3] = 0;
+        }
+      }
+      octx.putImageData(img, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(off, 0, 0, cols, rows, -CELL, -CELL, cols * CELL, rows * CELL);
+      return maxAbs;
+    }
+
+    /* ----- words: displaced by local slope, lifted by local height ----- */
+    function moveFloaters() {
+      const sy = window.scrollY, sx = window.scrollX, n = cols;
+      const top = sy - 40, bottom = sy + H + 40;
       for (let i = 0; i < floaters.length; i++) {
         const f = floaters[i];
         if (f.y < top || f.y > bottom) { if (f.moved) { f.el.style.transform = ""; f.moved = false; } continue; }
-        let dx = 0, dy = 0;
-        for (let j = 0; j < live.length; j++) {
-          const L = live[j];
-          const ox = f.x - L.x, oy = f.y - L.y;
-          const dist = Math.hypot(ox, oy);
-          if (dist > L.reach || dist < 1) continue;
-          let h = 0;
-          for (let k = 0; k < L.rings.length; k++) {
-            const g = (dist - L.rings[k].r) / 30;
-            h += L.rings[k].amp * Math.exp(-g * g);
-          }
-          if (h < 0.01) continue;
-          const push = h * L.amp;
-          dx += (ox / dist) * push;
-          dy += (oy / dist) * push - push * 0.45;
-        }
-        if (dx || dy) { f.el.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0)`; f.moved = true; }
+        const gx = Math.min(n - 2, Math.max(1, Math.round((f.x - sx) / CELL + 1)));
+        const gy = Math.min(rows - 2, Math.max(1, Math.round((f.y - sy) / CELL + 1)));
+        const idx = gy * n + gx;
+        const h = cur[idx];
+        const slx = cur[idx + 1] - cur[idx - 1], sly = cur[idx + n] - cur[idx - n];
+        let dx = slx * WORD_G, dy = sly * WORD_G - h * WORD_L;
+        if (dx > 9) dx = 9; else if (dx < -9) dx = -9;
+        if (dy > 9) dy = 9; else if (dy < -9) dy = -9;
+        if (Math.abs(dx) > 0.05 || Math.abs(dy) > 0.05) { f.el.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0)`; f.moved = true; }
         else if (f.moved) { f.el.style.transform = ""; f.moved = false; }
       }
-
-      raf = drops.length ? requestAnimationFrame(frame) : null;
-      if (!raf) floaters.forEach((f) => { if (f.moved) { f.el.style.transform = ""; f.moved = false; } });
     }
 
+    function frame(now) {
+      if (cacheDirty || now - lastCache > 1500) cacheFloaters();
+      applyScroll();
+      step();
+      const maxAbs = render();
+      moveFloaters();
+      tick++;
+      if (maxAbs < 0.004) quiet++; else quiet = 0;
+      if (quiet > 40) {
+        running = false; cur.fill(0); prev.fill(0); ctx.clearRect(0, 0, W, H); settleFloaters();
+        return;
+      }
+      requestAnimationFrame(frame);
+    }
+
+    /* ----- input ----- */
     // A drop wherever you click or tap
     document.addEventListener("pointerdown", (e) => {
       if (e.button !== undefined && e.button !== 0) return;
       drop(e.clientX, e.clientY, 1);
     }, { passive: true });
 
-    // Drops keep falling while the cursor moves inside a card
-    if (finePointer) {
-      document.querySelectorAll(".card").forEach((card) => {
-        let lx = 0, ly = 0, lt = 0;
-        card.addEventListener("pointerenter", (e) => { lx = e.clientX; ly = e.clientY; lt = performance.now(); drop(e.clientX, e.clientY, 0.6); });
-        card.addEventListener("pointermove", (e) => {
-          const now = performance.now();
-          const dist = Math.hypot(e.clientX - lx, e.clientY - ly);
-          if (dist < 30 || now - lt < 100) return;
-          lx = e.clientX; ly = e.clientY; lt = now;
-          drop(e.clientX, e.clientY, 0.3 + Math.min(dist, 120) / 350);
-        }, { passive: true });
-      });
-    }
+    // Moving the cursor (or a finger) drags through the water: a wake that follows the path
+    document.addEventListener("pointermove", (e) => {
+      const now = performance.now();
+      const x = e.clientX, y = e.clientY;
+      if (lastMove) {
+        const dt = Math.max(8, now - lastMove.t);
+        const dist = Math.hypot(x - lastMove.x, y - lastMove.y);
+        const speed = dist / dt; // px per ms
+        if (dist > 2) {
+          const inCard = !!(e.target && e.target.closest && e.target.closest(".card"));
+          const base = inCard ? 0.09 : 0.05;
+          const amp = base + Math.min(speed, 2.5) * (inCard ? 0.09 : 0.06);
+          const steps = Math.min(6, Math.max(1, Math.round(dist / 9)));
+          for (let i = 1; i <= steps; i++) {
+            const t = i / steps;
+            press(lastMove.x + (x - lastMove.x) * t, lastMove.y + (y - lastMove.y) * t, amp, 1.7 + Math.min(speed, 2) * 0.5);
+          }
+        }
+      }
+      lastMove = { x, y, t: now };
+      pointer = { x, y };
+    }, { passive: true });
+    document.addEventListener("pointerleave", () => { pointer = null; lastMove = null; });
+    document.addEventListener("pointerup", () => { lastMove = null; });
 
     // Ambient rain: a faint drop somewhere every few seconds
     let ambient = null;
     const schedule = () => {
       clearTimeout(ambient);
       ambient = setTimeout(() => {
-        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.35 + Math.random() * 0.25);
+        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.25 + Math.random() * 0.3);
         schedule();
-      }, 4500 + Math.random() * 4500);
+      }, 5000 + Math.random() * 5000);
     };
     schedule();
     document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
-    document.addEventListener("click", () => { cacheDirty = true; }, true);
+    // keep the water moving with the page even while idle
+    window.addEventListener("scroll", () => { if (!running) lastScroll = window.scrollY; }, { passive: true });
   }
 
   function setupNav() {
