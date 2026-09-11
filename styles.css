@@ -358,3 +358,5 @@ p { margin: 0; }
   .statement-text .w { opacity: 1; }
   .marquee-track, .ab-pulse, .scroll-hint span { animation: none; }
 }
+
+@media (max-height: 860px) { .scroll-hint { display: none; } }
