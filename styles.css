@@ -360,3 +360,11 @@ p { margin: 0; }
 }
 
 @media (max-height: 860px) { .scroll-hint { display: none; } }
+
+@media (max-width: 520px) {
+  .ab-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .ab-line { display: none; }
+  .ab-node { white-space: normal; text-align: center; justify-content: center; font-size: 11px; line-height: 1.25; padding: 8px 6px; }
+  .ab-center { gap: 6px; }
+  .ab-agent { padding: 10px; }
+}
