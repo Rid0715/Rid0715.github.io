@@ -33,6 +33,8 @@
   ];
 
   /* ============ Always-on features ============ */
+  setupTheme();
+  setupLens();
   setupNav();
   setupSkills();
   setupQuotes();
@@ -109,7 +111,7 @@
   }
 
   /* ---------- Spotlight cards ---------- */
-  document.querySelectorAll("[data-spot]").forEach((card) => {
+  document.querySelectorAll(".card").forEach((card) => {
     card.addEventListener("pointermove", (e) => {
       const r = card.getBoundingClientRect();
       card.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
@@ -225,6 +227,54 @@
   window.addEventListener("load", () => ScrollTrigger.refresh());
 
   /* ============ Feature setups ============ */
+
+  /* ---------- Theme (dark default, light on demand) ---------- */
+  function setupTheme() {
+    const btn = document.getElementById("themeToggle");
+    const meta = document.getElementById("themeColor");
+    if (!btn) return;
+    const root = document.documentElement;
+    const apply = (theme) => {
+      if (theme === "light") root.setAttribute("data-theme", "light"); else root.removeAttribute("data-theme");
+      if (meta) meta.setAttribute("content", theme === "light" ? "#fbfbfd" : "#000000");
+      btn.setAttribute("aria-label", theme === "light" ? "Switch to dark mode" : "Switch to light mode");
+      try { localStorage.setItem("theme", theme); } catch (e) {}
+    };
+    btn.setAttribute("aria-label", root.getAttribute("data-theme") === "light" ? "Switch to dark mode" : "Switch to light mode");
+    btn.addEventListener("click", (e) => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      if (!document.startViewTransition || reduced) {
+        root.classList.add("theming"); apply(next); setTimeout(() => root.classList.remove("theming"), 600);
+        return;
+      }
+      const r = btn.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      const vt = document.startViewTransition(() => apply(next));
+      vt.ready.then(() => {
+        root.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          { duration: 750, easing: "cubic-bezier(0.22, 1, 0.36, 1)", pseudoElement: "::view-transition-new(root)" }
+        );
+      });
+    });
+  }
+
+  /* ---------- Theme lens: opposite-theme clone of each card under the cursor ---------- */
+  function setupLens() {
+    if (!finePointer || reduced) return;
+    document.querySelectorAll(".card").forEach((card) => {
+      const lens = document.createElement("div");
+      lens.className = "card-lens";
+      lens.setAttribute("aria-hidden", "true");
+      lens.innerHTML = card.innerHTML;
+      lens.querySelectorAll("[id]").forEach((n) => n.removeAttribute("id"));
+      lens.querySelectorAll("a, button, [tabindex]").forEach((n) => n.setAttribute("tabindex", "-1"));
+      lens.querySelectorAll("img").forEach((n) => n.setAttribute("loading", "eager"));
+      lens.inert = true;
+      card.appendChild(lens);
+    });
+  }
 
   function setupNav() {
     const nav = document.getElementById("nav");

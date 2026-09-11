@@ -9,12 +9,13 @@
   <meta property="og:description" content="Distributed systems, cloud reliability and agentic AI. I own systems end-to-end.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/profile-512.jpg">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#000000" id="themeColor">
+  <script>(function(){try{if(localStorage.getItem("theme")==="light"){document.documentElement.setAttribute("data-theme","light");}}catch(e){}})();</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-weight='700' font-size='28' fill='%23fff'%3ERD%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.3.0">
+  <link rel="stylesheet" href="styles.css?v=1.4.0">
 </head>
 <body>
 
@@ -35,7 +36,13 @@
         <a href="#skills" data-nav="skills">Skills</a>
         <a href="#contact" data-nav="contact">Contact</a>
       </nav>
-      <a class="nav-cta" href="assets/Ridham_Dholiya_Resume.pdf" target="_blank" rel="noopener" data-magnetic>Resume</a>
+      <div class="nav-right">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" data-magnetic>
+          <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <a class="nav-cta" href="assets/Ridham_Dholiya_Resume.pdf" target="_blank" rel="noopener" data-magnetic>Resume</a>
+      </div>
     </div>
   </header>
 
@@ -478,7 +485,8 @@
         <p class="sub" data-reveal>Open to senior full-stack, backend and AI-engineering roles, hybrid or relocation.</p>
         <div class="contact-row" data-reveal>
           <a class="btn btn-primary" href="mailto:rdj070102@gmail.com" data-magnetic>rdj070102@gmail.com</a>
-          <a class="btn btn-ghost" href="tel:+919824190869" data-magnetic>+91 98241 90869</a>
+          <a class="btn btn-ghost" href="tel:+919824190869" data-magnetic><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>Call me</a>
+          <a class="btn btn-ghost" href="https://wa.me/919824190869?text=Hi%20Ridham%2C%20I%20came%20across%20your%20portfolio" target="_blank" rel="noopener" data-magnetic><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 0 16.4 8.1 8.1 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-3.3 4.4c-.2 0-.5 0-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4l-.5-.3-1.9-.9c-.3-.1-.4-.1-.6.1l-.9 1.1c-.2.2-.3.2-.6.1a6.8 6.8 0 0 1-3.4-3c-.3-.4 0-.5.1-.7l.5-.6.3-.5c.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.4-.5-.6-.5z"/></svg>WhatsApp</a>
           <a class="btn btn-ghost" href="https://www.linkedin.com/in/ridham-dholiya-481b83245/" target="_blank" rel="noopener" data-magnetic>LinkedIn <span aria-hidden="true">↗</span></a>
           <a class="btn btn-ghost" href="https://github.com/Rid0715" target="_blank" rel="noopener" data-magnetic>GitHub <span aria-hidden="true">↗</span></a>
         </div>
@@ -498,6 +506,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
-  <script src="main.js?v=1.3.0"></script>
+  <script src="main.js?v=1.4.0"></script>
 </body>
 </html>
