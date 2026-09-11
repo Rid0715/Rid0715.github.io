@@ -331,7 +331,7 @@
     }
     // a drop is a wave train: one strong leading crest, then weaker waves that trail and fade
     function drop(x, y, strength) {
-      const amp = 0.19 + 0.26 * strength, r = 1.6 + 2.2 * strength;
+      const amp = 0.115 + 0.155 * strength, r = 1.6 + 2.2 * strength;
       press(x, y, amp, r, 0);
       const train = [[90, 0.5], [210, 0.28], [350, 0.15], [520, 0.07]];
       train.forEach(([delay, k]) => setTimeout(() => press(x, y, amp * k, r * 0.9, 1), delay));
@@ -454,7 +454,7 @@
         const speed = dist / dt; // px per ms
         const inCard = !!(e.target && e.target.closest && e.target.closest(".card, [data-water]"));
         if (dist > 2 && inCard) {
-          const amp = 0.022 + Math.min(speed, 2) * 0.024;
+          const amp = 0.013 + Math.min(speed, 2) * 0.014;
           const steps = Math.min(4, Math.max(1, Math.round(dist / 14)));
           for (let i = 1; i <= steps; i++) {
             const t = i / steps;
@@ -473,7 +473,7 @@
     const schedule = () => {
       clearTimeout(ambient);
       ambient = setTimeout(() => {
-        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.12 + Math.random() * 0.2);
+        if (!document.hidden) drop(W * (0.1 + Math.random() * 0.8), H * (0.1 + Math.random() * 0.8), 0.1 + Math.random() * 0.15);
         schedule();
       }, 5000 + Math.random() * 5000);
     };
