@@ -34,7 +34,6 @@
 
   /* ============ Always-on features ============ */
   setupTheme();
-  setupLens();
   setupNav();
   setupSkills();
   setupQuotes();
@@ -110,15 +109,6 @@
     });
   }
 
-  /* ---------- Spotlight cards ---------- */
-  document.querySelectorAll(".card").forEach((card) => {
-    card.addEventListener("pointermove", (e) => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
-      card.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
-    });
-  });
-
   /* ---------- Hero ---------- */
   const heroItems = gsap.utils.toArray("[data-hero]");
   gsap.set(heroItems, { opacity: 0, y: 40 });
@@ -186,24 +176,6 @@
     gsap.ticker.add(() => { if (ts > 1) { ts = Math.max(1, ts * 0.96); track.style.animationDuration = `${60 / ts}s`; } });
   }
 
-  /* ---------- Tilt ---------- */
-  if (finePointer) {
-    document.querySelectorAll("[data-tilt]").forEach((card) => {
-      let raf = null;
-      card.addEventListener("pointermove", (e) => {
-        const r = card.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width;
-        const py = (e.clientY - r.top) / r.height;
-        if (raf) return;
-        raf = requestAnimationFrame(() => {
-          raf = null;
-          gsap.to(card, { rotateY: (px - 0.5) * 6, rotateX: (0.5 - py) * 6, transformPerspective: 900, duration: 0.6, ease: "power2.out" });
-        });
-      });
-      card.addEventListener("pointerleave", () => gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.9, ease: "power3.out" }));
-    });
-  }
-
   /* ---------- Active nav + hide on scroll down ---------- */
   const navEl = document.getElementById("nav");
   const links = [...document.querySelectorAll("[data-nav]")];
@@ -261,22 +233,6 @@
       }).catch(() => {});
       vt.updateCallbackDone.catch(() => apply(next));
       vt.finished.catch(() => { if (root.getAttribute("data-theme") !== (next === "light" ? "light" : null)) apply(next); });
-    });
-  }
-
-  /* ---------- Theme lens: opposite-theme clone of each card under the cursor ---------- */
-  function setupLens() {
-    if (!finePointer || reduced) return;
-    document.querySelectorAll(".card").forEach((card) => {
-      const lens = document.createElement("div");
-      lens.className = "card-lens";
-      lens.setAttribute("aria-hidden", "true");
-      lens.innerHTML = card.innerHTML;
-      lens.querySelectorAll("[id]").forEach((n) => n.removeAttribute("id"));
-      lens.querySelectorAll("a, button, [tabindex]").forEach((n) => n.setAttribute("tabindex", "-1"));
-      lens.querySelectorAll("img").forEach((n) => n.setAttribute("loading", "eager"));
-      lens.inert = true;
-      card.appendChild(lens);
     });
   }
 

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.4.1">
+  <link rel="stylesheet" href="styles.css?v=1.5.0">
 </head>
 <body>
 
@@ -148,7 +148,7 @@
           <p class="sub">Three things I go deep on, and take responsibility for in production.</p>
         </div>
         <div class="pillar-grid">
-          <article class="pillar card" data-reveal data-tilt data-spot>
+          <article class="pillar card" data-reveal>
             <div class="pillar-icon" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="6" y="8" width="12" height="10" rx="3"/><rect x="30" y="8" width="12" height="10" rx="3"/>
@@ -163,7 +163,7 @@
             </ul>
           </article>
 
-          <article class="pillar card" data-reveal data-tilt data-spot>
+          <article class="pillar card" data-reveal>
             <div class="pillar-icon" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 34a8 8 0 0 1-1-16 11 11 0 0 1 21-3 8 8 0 0 1 2 19H14z"/>
@@ -177,7 +177,7 @@
             </ul>
           </article>
 
-          <article class="pillar card" data-reveal data-tilt data-spot>
+          <article class="pillar card" data-reveal>
             <div class="pillar-icon" aria-hidden="true">
               <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="24" cy="24" r="6"/><circle cx="24" cy="8" r="3"/><circle cx="24" cy="40" r="3"/><circle cx="8" cy="24" r="3"/><circle cx="40" cy="24" r="3"/>
@@ -204,7 +204,7 @@
         </div>
 
         <!-- IntuScribe -->
-        <article class="project project-lg card" data-reveal data-spot>
+        <article class="project project-lg card" data-reveal>
           <div class="project-media">
             <div class="browser-frame" data-clip>
               <div class="browser-bar"><span></span><span></span><span></span><i>intuscribe.com</i></div>
@@ -235,7 +235,7 @@
         </article>
 
         <!-- GrowthOS -->
-        <article class="project project-lg project-flip card" data-reveal data-spot>
+        <article class="project project-lg project-flip card" data-reveal>
           <div class="project-media">
             <div class="agent-board" data-clip aria-label="Agent pipeline: crawl website, build strategy docs, connect analytics, run agents, human approval, publish">
               <div class="ab-row">
@@ -283,7 +283,7 @@
         </article>
 
         <!-- EaseEmbro -->
-        <article class="project project-lg card" data-reveal data-spot>
+        <article class="project project-lg card" data-reveal>
           <div class="project-media">
             <div class="phones">
               <img class="phone" src="assets/easeembro-1.jpg" alt="EaseEmbro Mobile screenshot" loading="lazy">
@@ -315,19 +315,19 @@
 
         <!-- Smaller projects -->
         <div class="project-grid">
-          <article class="mini card" data-reveal data-tilt data-spot>
+          <article class="mini card" data-reveal>
             <p class="kicker">Microservices</p>
             <h4>E-commerce platform</h4>
             <p>Amazon-style platform split into product, auth, cart and order services. Kafka for async inter-service messaging, Redis caching, NestJS, MongoDB for catalogue and SQL for transactions.</p>
             <ul class="chips"><li>NestJS</li><li>Kafka</li><li>Redis</li><li>MongoDB</li><li>SQL</li></ul>
           </article>
-          <article class="mini card" data-reveal data-tilt data-spot>
+          <article class="mini card" data-reveal>
             <p class="kicker">Platform</p>
             <h4>Unibox</h4>
             <p>Centralised email management: one interface across Gmail, Microsoft and SMTP with scoped, role-based permissions so teams only see their own prospect lists.</p>
             <ul class="chips"><li>Express</li><li>MySQL</li><li>Redis</li><li>Gmail API</li><li>MS Graph</li></ul>
           </article>
-          <article class="mini card" data-reveal data-tilt data-spot>
+          <article class="mini card" data-reveal>
             <p class="kicker">Search</p>
             <h4>Learning Management System</h4>
             <p>Video-streaming LMS with a teacher analytics dashboard and recommendation-based search, powered by Apache Solr for fast, accurate results.</p>
@@ -435,7 +435,7 @@
           </article>
         </div>
 
-        <div class="edu card" data-reveal data-spot>
+        <div class="edu card" data-reveal>
           <p class="kicker">Education</p>
           <p><b>B.Tech, Information Technology</b> · G. H. Patel College of Engineering &amp; Technology, Gujarat Technological University · 2019 – 2022 · CGPA 8.4</p>
         </div>
@@ -459,14 +459,14 @@
       </div>
       <div class="container">
         <div class="skill-grid" id="skillGrid" role="tablist" aria-label="Skill categories">
-          <button class="skill card is-active" role="tab" aria-selected="true" data-spot data-cat="languages"><h4>Languages</h4><p>TypeScript, JavaScript, Java, C++, C#, Go, Python, SQL</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
-          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="backend"><h4>Backend &amp; frameworks</h4><p>Node.js, NestJS, Spring Boot, Hibernate, ASP.NET Core, Django, Socket.IO</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
-          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="frontend"><h4>Frontend</h4><p>React (micro-frontends), Angular 15+, Next.js, Electron</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
-          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="data"><h4>Data &amp; messaging</h4><p>PostgreSQL, MongoDB, MySQL, Redis, Solr, Kafka, RabbitMQ, vector databases</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
-          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="cloud"><h4>Cloud &amp; DevOps</h4><p>AWS, GCP, Docker, Kubernetes, Jenkins, Terraform, Prometheus, Grafana</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
-          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="ai"><h4>AI engineering</h4><p>Claude, OpenAI, Gemini, Sarvam AI, LangChain, RAG, Inngest, Claude Code</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
-          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="practices"><h4>Practices</h4><p>System design, TDD with Jest &amp; Supertest, Agile/Scrum, code review, security</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
-          <button class="skill card" role="tab" aria-selected="false" data-spot data-cat="learning"><h4>Currently deepening</h4><p>Snowflake, Playwright automation, Kubernetes operators</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card is-active" role="tab" aria-selected="true" data-cat="languages"><h4>Languages</h4><p>TypeScript, JavaScript, Java, C++, C#, Go, Python, SQL</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-cat="backend"><h4>Backend &amp; frameworks</h4><p>Node.js, NestJS, Spring Boot, Hibernate, ASP.NET Core, Django, Socket.IO</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-cat="frontend"><h4>Frontend</h4><p>React (micro-frontends), Angular 15+, Next.js, Electron</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-cat="data"><h4>Data &amp; messaging</h4><p>PostgreSQL, MongoDB, MySQL, Redis, Solr, Kafka, RabbitMQ, vector databases</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-cat="cloud"><h4>Cloud &amp; DevOps</h4><p>AWS, GCP, Docker, Kubernetes, Jenkins, Terraform, Prometheus, Grafana</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-cat="ai"><h4>AI engineering</h4><p>Claude, OpenAI, Gemini, Sarvam AI, LangChain, RAG, Inngest, Claude Code</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-cat="practices"><h4>Practices</h4><p>System design, TDD with Jest &amp; Supertest, Agile/Scrum, code review, security</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
+          <button class="skill card" role="tab" aria-selected="false" data-cat="learning"><h4>Currently deepening</h4><p>Snowflake, Playwright automation, Kubernetes operators</p><span class="skill-arrow" aria-hidden="true">↓</span></button>
         </div>
         <div class="skill-panel" id="skillPanel" role="tabpanel">
           <div class="skill-panel-inner">
@@ -506,6 +506,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
-  <script src="main.js?v=1.4.1"></script>
+  <script src="main.js?v=1.5.0"></script>
 </body>
 </html>
