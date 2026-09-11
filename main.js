@@ -10,9 +10,9 @@
   /* ============ Data ============ */
   const SKILLS = {
     languages: { title: "Languages", sub: "Typed where it matters, fast where it counts.", items: [
-      ["TypeScript", "typescript"], ["JavaScript", "javascript"], ["Go", "go"], ["Python", "python"], ["SQL", "postgresql"], ["HTML5", "html5"], ["CSS", "css"]]},
+      ["TypeScript", "typescript"], ["JavaScript", "javascript"], ["Java", "openjdk"], ["C++", "cplusplus"], ["C#", null], ["Go", "go"], ["Python", "python"], ["SQL", "postgresql"], ["HTML5", "html5"], ["CSS", "css"]]},
     backend: { title: "Backend & frameworks", sub: "APIs, realtime and services that stay consistent under load.", items: [
-      ["Node.js", "nodedotjs"], ["Express", "express"], ["NestJS", "nestjs"], ["Django", "django"], ["Socket.IO", "socketdotio"], ["REST APIs", null], ["GraphQL", "graphql"]]},
+      ["Node.js", "nodedotjs"], ["Express", "express"], ["NestJS", "nestjs"], ["Spring Boot", "springboot"], ["Spring", "spring"], ["Hibernate / JPA", "hibernate"], ["ASP.NET Core", "dotnet"], ["Entity Framework", null], ["Maven", "apachemaven"], ["Gradle", "gradle"], ["Django", "django"], ["Socket.IO", "socketdotio"], ["REST APIs", null], ["GraphQL", "graphql"]]},
     frontend: { title: "Frontend", sub: "Micro-frontends, desktop shells and polished UI.", items: [
       ["React", "react"], ["Angular 15+", "angular"], ["Next.js", "nextdotjs"], ["Electron", "electron"], ["Tailwind CSS", "tailwindcss"], ["Vite", "vite"]]},
     data: { title: "Data & messaging", sub: "Modelling, query optimisation and message-driven IPC.", items: [
@@ -23,8 +23,8 @@
       ["Claude", "claude"], ["OpenAI", null], ["Gemini", "googlegemini"], ["Sarvam AI", null], ["LangChain", "langchain"], ["RAG", null], ["Inngest", null], ["Claude Code", "anthropic"]]},
     practices: { title: "Practices", sub: "How the work actually gets done.", items: [
       ["System design", null], ["Jest", "jest"], ["Supertest", null], ["Git", "git"], ["Jira", "jira"], ["Agile / Scrum", null], ["Code review", null], ["Security", null]]},
-    learning: { title: "Currently learning", sub: "Adding depth on the data and testing side.", items: [
-      ["Snowflake", "snowflake"], ["Playwright", null], ["Spring Boot", "springboot"]]},
+    learning: { title: "Currently deepening", sub: "Adding depth on the data and testing side.", items: [
+      ["Snowflake", "snowflake"], ["Playwright", null], ["Kubernetes operators", "kubernetes"]]},
   };
 
   const BURST_LABELS = [
@@ -35,7 +35,6 @@
   /* ============ Always-on features ============ */
   setupNav();
   setupSkills();
-  setupDM();
   setupQuotes();
 
   if (reduced || !hasGsap) {
@@ -430,39 +429,4 @@
     requestAnimationFrame(() => { panel.style.height = "auto"; logoGrid.querySelectorAll(".logo-tile").forEach((t) => (t.style.opacity = 1)); });
   }
 
-  /* ---------- Direct message composer ---------- */
-  function setupDM() {
-    const name = document.getElementById("dmName");
-    const email = document.getElementById("dmEmail");
-    const msg = document.getElementById("dmMessage");
-    const status = document.getElementById("dmStatus");
-    if (!name || !msg) return;
-    const TO = "rdj070102@gmail.com";
-
-    function compose() {
-      const n = name.value.trim(), e = email.value.trim();
-      const body = (msg.value.trim() || msg.placeholder).replace(/\s+$/, "");
-      const sig = [n, e].filter(Boolean).join(" · ");
-      const subject = n ? `Message for Ridham from ${n}` : "Message for Ridham";
-      return { subject, body: sig ? `${body}\n\n— ${sig}` : body };
-    }
-    function say(text) { status.textContent = text; clearTimeout(say.t); say.t = setTimeout(() => (status.textContent = ""), 4000); }
-
-    document.getElementById("dmGmail").addEventListener("click", () => {
-      const { subject, body } = compose();
-      window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(TO)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, "_blank", "noopener");
-      say("Opening Gmail…");
-    });
-    document.getElementById("dmMail").addEventListener("click", () => {
-      const { subject, body } = compose();
-      window.location.href = `mailto:${TO}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      say("Opening your mail app…");
-    });
-    document.getElementById("dmCopy").addEventListener("click", async () => {
-      const { body } = compose();
-      try { await navigator.clipboard.writeText(body); say("Message copied to clipboard."); }
-      catch (err) { msg.select(); document.execCommand("copy"); say("Message copied."); }
-    });
-    document.getElementById("dmForm").addEventListener("submit", (e) => e.preventDefault());
-  }
 })();
